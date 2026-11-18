@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZakatMate - Kalkulator Zakat</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="loader.js"></script>
+</head>
+<body>
+
+<header>
+    <div class="logo">🌙 ZakatMate</div>
+
+    <nav>
+        <a href="index.html">Beranda</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="kalkulator.html" class="active">Kalkulator</a>
+        <a href="zakat.html">Informasi Zakat</a>
+        <a href="nisab.html">Nisab</a>
+        <a href="penyaluran.html">Penyaluran</a>
+        
+    </nav>
+</header>
+
+<section class="page-header green-header">
+    <span class="badge">🧮 Kalkulator</span>
+    <h1>Kalkulator Zakat</h1>
+    <p>Tinggal isi angkanya, sisanya kita yang hitungin. Gampang banget!</p>
+</section>
+
+<section class="content">
+
+    <!-- Harga acuan -->
+    <div class="calc-card">
+        <h3>💡 Harga Acuan</h3>
+        <p class="calc-hint">Harga di bawah ini cuma patokan awal ya. Update sesuai harga hari ini biar hitungannya nggak meleset.</p>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="hargaEmas">Harga emas per gram (Rp)</label>
+                <input type="number" id="hargaEmas" min="0">
+            </div>
+            <div class="form-group">
+                <label for="hargaPerak">Harga perak per gram (Rp)</label>
+                <input type="number" id="hargaPerak" min="0">
+            </div>
+        </div>
+        <p class="calc-hint" id="infoNisab"></p>
+    </div>
+
+    <!-- Tab utama -->
+    <div class="tabs">
+        <button class="tab-btn active" data-group="main" data-target="tabFitrah">🌾 Zakat Fitrah</button>
+        <button class="tab-btn" data-group="main" data-target="tabMal">💰 Zakat Mal</button>
+    </div>
+
+    <!-- ===== ZAKAT FITRAH ===== -->
+    <div class="tab-panel show" data-group="main" id="tabFitrah">
+        <div class="calc-card">
+            <h3>Zakat Fitrah</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="jumlahJiwa">Mau bayarin zakat buat berapa orang?</label>
+                    <input type="number" id="jumlahJiwa" min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label for="takaranFitrah">Beras per orang (kg)</label>
+                    <input type="number" id="takaranFitrah" min="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="hargaBeras">Harga beras per kg (Rp)</label>
+                    <input type="number" id="hargaBeras" min="0">
+                </div>
+            </div>
+            <button class="btn-calc" id="hitungFitrah">Hitung Zakat Fitrah</button>
+            <div id="hasilFitrah" class="result-box"></div>
+        </div>
+    </div>
+
+    <!-- ===== ZAKAT MAL ===== -->
+    <div class="tab-panel" data-group="main" id="tabMal">
+
+        <div class="tabs sub-tabs">
+            <button class="tab-btn active" data-group="mal" data-target="malPenghasilan">💼 Penghasilan</button>
+            <button class="tab-btn" data-group="mal" data-target="malEmas">💎 Emas / Perak</button>
+            <button class="tab-btn" data-group="mal" data-target="malPertanian">🌱 Pertanian</button>
+            <button class="tab-btn" data-group="mal" data-target="malDagang">🏪 Perdagangan</button>
+            <button class="tab-btn" data-group="mal" data-target="malTabungan">🏦 Tabungan</button>
+            <button class="tab-btn" data-group="mal" data-target="malSaham">📈 Saham</button>
+            <button class="tab-btn" data-group="mal" data-target="malPeternakan">🐄 Peternakan</button>
+            <button class="tab-btn" data-group="mal" data-target="malRikaz">🏺 Rikaz (Temuan)</button>
+            <button class="tab-btn" data-group="mal" data-target="malPerusahaan">🏢 Perusahaan</button>
+        </div>
+
+        <!-- Penghasilan -->
+        <div class="tab-panel show" data-group="mal" id="malPenghasilan">
+            <div class="calc-card">
+                <h3>Zakat Penghasilan</h3>
+                <p class="calc-hint">Batas wajib zakatnya setara 85 gram emas per tahun, atau 1/12-nya kalau dihitung per bulan.</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="gaji">Gaji per bulan (Rp)</label>
+                        <input type="number" id="gaji" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="gajiLain">Penghasilan sampingan per bulan (Rp), kalau ada</label>
+                        <input type="number" id="gajiLain" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="cicilan">Cicilan kebutuhan pokok per bulan (Rp), kalau ada</label>
+                        <input type="number" id="cicilan" min="0">
+                    </div>
+                </div>
+                <button class="btn-calc" id="hitungPenghasilan">Hitung Zakat Penghasilan</button>
+                <div id="hasilPenghasilan" class="result-box"></div>
+            </div>
+        </div>
+
+        <!-- Emas / Perak -->
+        <div class="tab-panel" data-group="mal" id="malEmas">
+            <div class="calc-card">
+                <h3>Zakat Emas / Perak</h3>
+                <p class="calc-hint">Zakat emas berlaku kalau kamu punya minimal 85 gram dan udah disimpan setahun. Kalau perak, minimal 595 gram.</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="jenisLogam">Jenis</label>
+                        <select id="jenisLogam">
+                            <option value="emas">Emas</option>
+                            <option value="perak">Perak</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="gramLogam">Punya berapa gram nih?</label>
+                        <input type="number" id="gramLogam" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="haulLogam">Udah disimpan setahun belum?</label>
+                        <select id="haulLogam">
+                            <option value="ya">Udah</option>
+                            <option value="tidak">Belum</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-calc" id="hitungEmas">Hitung Zakat Emas / Perak</button>
+                <div id="hasilEmas" class="result-box"></div>
+            </div>
+        </div>
+
+        <!-- Pertanian -->
+        <div class="tab-panel" data-group="mal" id="malPertanian">
+            <div class="calc-card">
+                <h3>Zakat Pertanian dan Perkebunan</h3>
+                <p class="calc-hint">Zakat pertanian dikeluarin pas panen, nggak perlu nunggu setahun. Minimalnya 653 kg gabah atau 522 kg beras.</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="jenisPanen">Hasil panennya apa nih?</label>
+                        <select id="jenisPanen">
+                            <option value="653">Gabah (minimal 653 kg)</option>
+                            <option value="522">Beras (minimal 522 kg)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="hasilPanen">Panennya berapa kg?</label>
+                        <input type="number" id="hasilPanen" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="pengairan">Sawah atau kebunnya diairi pakai apa?</label>
+                        <select id="pengairan">
+                            <option value="0.1">Air hujan atau sumber alami (zakat 10%)</option>
+                            <option value="0.05">Irigasi atau pompa yang pakai biaya (zakat 5%)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="hargaPanen">Harga hasil panen per kg (Rp), kalau mau dihitung pakai rupiah</label>
+                        <input type="number" id="hargaPanen" min="0">
+                    </div>
+                </div>
+                <button class="btn-calc" id="hitungPertanian">Hitung Zakat Pertanian</button>
+                <div id="hasilPertanian" class="result-box"></div>
+            </div>
+        </div>
+
+        <!-- Perdagangan -->
+        <div class="tab-panel" data-group="mal" id="malDagang">
+            <div class="calc-card">
+                <h3>Zakat Perdagangan</h3>
+                <p class="calc-hint">Yang dihitung: modal, untung, dan piutang yang pasti kebayar, terus dikurangi utang yang udah jatuh tempo.</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="modalDagang">Modal atau nilai barang dagangan (Rp)</label>
+                        <input type="number" id="modalDagang" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="untungDagang">Untung (Rp)</label>
+                        <input type="number" id="untungDagang" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="piutangDagang">Piutang yang pasti kebayar (Rp)</label>
+                        <input type="number" id="piutangDagang" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="utangDagang">Utang yang udah jatuh tempo (Rp)</label>
+                        <input type="number" id="utangDagang" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="haulDagang">Usahanya udah jalan setahun belum?</label>
+                        <select id="haulDagang">
+                            <option value="ya">Udah</option>
+                            <option value="tidak">Belum</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-calc" id="hitungDagang">Hitung Zakat Perdagangan</button>
+                <div id="hasilDagang" class="result-box"></div>
+            </div>
+        </div>
+
+<!-- Tabungan -->
+        <div class="tab-panel" data-group="mal" id="malTabungan">
+            <div class="calc-card">
+                <h3>Zakat Tabungan</h3>
+                <p class="calc-hint">Zakat tabungan wajib dikeluarkan jika saldo sudah mencapai nisab (setara 85 gram emas) dan mengendap selama 1 tahun.</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="saldoTabungan">Saldo Tabungan (Rp)</label>
+                        <input type="number" id="saldoTabungan" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="bungaTabungan">Bunga / Bagi Hasil (Rp), tidak dihitung sebagai harta zakat</label>
+                        <input type="number" id="bungaTabungan" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="haulTabungan">Sudah mengendap setahun?</label>
+                        <select id="haulTabungan">
+                            <option value="ya">Udah</option>
+                            <option value="tidak">Belum</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-calc" id="hitungTabungan">Hitung Zakat Tabungan</button>
+                <div id="hasilTabungan" class="result-box"></div>
+            </div>
+        </div>
+
+        
+        <div class="tab-panel" data-group="mal" id="malSaham">
+            <div class="calc-card">
+                <h3>Zakat Saham & Investasi</h3>
+                <p class="calc-hint">Dihitung dari total nilai saham saat ini ditambah dividen, jika mencapai nisab 85 gram emas dan sudah 1 tahun.</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nilaiSaham">Nilai Saham/Investasi Saat Ini (Rp)</label>
+                        <input type="number" id="nilaiSaham" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="dividenSaham">Dividen yang didapat (Rp)</label>
+                        <input type="number" id="dividenSaham" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="haulSaham">Sudah setahun (Haul)?</label>
+                        <select id="haulSaham">
+                            <option value="ya">Udah</option>
+                            <option value="tidak">Belum</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-calc" id="hitungSaham">Hitung Zakat Saham</button>
+                <div id="hasilSaham" class="result-box"></div>
+            </div>
+        </div>
+
+        <!-- Peternakan -->
+        <div class="tab-panel" data-group="mal" id="malPeternakan">
+            <div class="calc-card">
+                <h3>Zakat Peternakan</h3>
+                <p class="calc-hint">Zakat untuk hewan yang diternakkan/digembalakan. Nisab: Sapi/Kerbau (30 ekor) atau Kambing/Domba (40 ekor).</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="jenisTernak">Jenis Hewan Ternak</label>
+                        <select id="jenisTernak">
+                            <option value="kambing">Kambing / Domba</option>
+                            <option value="sapi">Sapi / Kerbau</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="jumlahTernak">Jumlah Ekor</label>
+                        <input type="number" id="jumlahTernak" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="haulTernak">Sudah dimiliki setahun?</label>
+                        <select id="haulTernak">
+                            <option value="ya">Udah</option>
+                            <option value="tidak">Belum</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-calc" id="hitungPeternakan">Hitung Zakat Peternakan</button>
+                <div id="hasilPeternakan" class="result-box"></div>
+            </div>
+        </div>
+
+        <!-- Rikaz -->
+        <div class="tab-panel" data-group="mal" id="malRikaz">
+            <div class="calc-card">
+                <h3>Zakat Rikaz (Barang Temuan)</h3>
+                <p class="calc-hint">Zakat untuk harta karun atau barang temuan. Tidak ada syarat harus 1 tahun, langsung dikeluarkan 20% saat ditemukan.</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nilaiRikaz">Nilai Barang Temuan (Rp)</label>
+                        <input type="number" id="nilaiRikaz" min="0">
+                    </div>
+                </div>
+                <button class="btn-calc" id="hitungRikaz">Hitung Zakat Rikaz</button>
+                <div id="hasilRikaz" class="result-box"></div>
+            </div>
+        </div>
+
+        <!-- Perusahaan -->
+        <div class="tab-panel" data-group="mal" id="malPerusahaan">
+            <div class="calc-card">
+                <h3>Zakat Perusahaan</h3>
+                <p class="calc-hint">Dihitung dari Aset Lancar dikurangi Utang Jangka Pendek. Nisab setara 85 gram emas dengan tarif 2,5% per tahun.</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="asetLancar">Total Aset Lancar (Rp)</label>
+                        <input type="number" id="asetLancar" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="utangPerusahaan">Utang Jangka Pendek yang jatuh tempo (Rp)</label>
+                        <input type="number" id="utangPerusahaan" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="haulPerusahaan">Perusahaan sudah berjalan setahun?</label>
+                        <select id="haulPerusahaan">
+                            <option value="ya">Udah</option>
+                            <option value="tidak">Belum</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-calc" id="hitungPerusahaan">Hitung Zakat Perusahaan</button>
+                <div id="hasilPerusahaan" class="result-box"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="note">
+        <strong>💡 Catatan:</strong>
+        <p>
+            Hasilnya cuma perkiraan ya. Kalau kondisimu agak ribet, tanya aja ke lembaga zakat resmi atau ustaz/ulama setempat.
+        </p>
+    </div>
+
+</section>
+
+<footer>
+    <div>
+        <h3>🌙 ZakatMate</h3>
+        <p>Belajar zakat dengan cara yang sederhana.</p>
+    </div>
+
+    <p>© 2026 ZakatMate</p>
+</footer>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

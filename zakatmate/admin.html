@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZakatMate - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="loader.js"></script>
+</head>
+<body>
+
+<header>
+    <div class="logo">🌙 ZakatMate</div>
+
+    <nav>
+        <a href="index.html">Beranda</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="kalkulator.html">Kalkulator</a>
+        <a href="zakat.html">Informasi Zakat</a>
+        <a href="nisab.html">Nisab</a>
+        <a href="penyaluran.html">Penyaluran</a>
+        <a href="admin.html" class="active">Admin</a>
+    </nav>
+</header>
+
+<section class="admin-header">
+    <div>
+        <span class="badge">⚙️ Admin Panel</span>
+        <h1>Dashboard Admin</h1>
+        <p>Di sini kamu bebas nambah, ngubah, atau hapus isi yang tampil di Dashboard dan Kalkulator.</p>
+    </div>
+
+    <a href="index.html" class="btn-secondary">← Kembali ke Website</a>
+</section>
+
+<section class="admin-content">
+
+    <div class="dashboard-cards">
+        <div class="dashboard-card pink">
+            <span>📖</span>
+            <h3>Pengertian Zakat</h3>
+            <strong id="count-pengertian">0</strong>
+            <p>Data tersedia</p>
+        </div>
+        <div class="dashboard-card green">
+            <span>💰</span>
+            <h3>Jenis Zakat</h3>
+            <strong id="count-jenis">0</strong>
+            <p>Data tersedia</p>
+        </div>
+        <div class="dashboard-card purple">
+            <span>🤲</span>
+            <h3>Golongan Penerima</h3>
+            <strong id="count-golongan">0</strong>
+            <p>Golongan tersedia</p>
+        </div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="panel-heading">
+            <div>
+                <h2>Data Pengertian Zakat</h2>
+                <p>Tampil di bagian Pengertian Zakat pada Dashboard</p>
+            </div>
+            <button class="add-button" data-add="pengertian">+ Tambah Data</button>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead><tr><th>No</th><th>Judul</th><th>Isi</th><th>Aksi</th></tr></thead>
+                <tbody id="tbody-pengertian"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="panel-heading">
+            <div>
+                <h2>Data Jenis Zakat</h2>
+                <p>Tampil di bagian Jenis-Jenis Zakat pada Dashboard</p>
+            </div>
+            <button class="add-button" data-add="jenis">+ Tambah Data</button>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead><tr><th>No</th><th>Ikon</th><th>Judul</th><th>Deskripsi</th><th>Aksi</th></tr></thead>
+                <tbody id="tbody-jenis"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="panel-heading">
+            <div>
+                <h2>Data Golongan Penerima Zakat</h2>
+                <p>Tampil di bagian Penerima Zakat pada Dashboard</p>
+            </div>
+            <button class="add-button" data-add="golongan">+ Tambah Data</button>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead><tr><th>No</th><th>Ikon</th><th>Nama</th><th>Deskripsi</th><th>Aksi</th></tr></thead>
+                <tbody id="tbody-golongan"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="panel-heading">
+            <div>
+                <h2>Pengaturan Kalkulator</h2>
+                <p>Harga patokan yang otomatis keisi di halaman Kalkulator</p>
+            </div>
+        </div>
+
+        <form id="formPengaturan">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="setEmas">Harga emas per gram (Rp)</label>
+                    <input type="number" id="setEmas" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="setPerak">Harga perak per gram (Rp)</label>
+                    <input type="number" id="setPerak" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="setBeras">Harga beras per kg (Rp)</label>
+                    <input type="number" id="setBeras" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="setTakaran">Takaran fitrah per jiwa (kg)</label>
+                    <input type="number" id="setTakaran" min="0" step="0.1" required>
+                </div>
+            </div>
+            <button type="submit" class="btn-calc">Simpan Pengaturan</button>
+            <button type="button" class="delete-button" id="resetData" style="margin-left:10px;padding:13px 18px;border-radius:13px;">Reset ke Data Awal</button>
+        </form>
+    </div>
+
+</section>
+
+<!-- Modal tambah / edit -->
+<div class="modal" id="modal">
+    <div class="modal-box">
+        <h3 id="modalTitle"></h3>
+        <form id="modalForm">
+            <div id="modalFields"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" id="modalCancel">Batal</button>
+                <button type="submit" class="btn-calc">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+    <div>
+        <h3>🌙 ZakatMate</h3>
+        <p>Admin Panel</p>
+    </div>
+
+    <p>© 2026 ZakatMate</p>
+</footer>
+
+<script src="data.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
