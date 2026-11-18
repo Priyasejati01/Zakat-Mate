@@ -1,0 +1,10 @@
+{
+  "status": "success",
+  "waktu_update": "2026-11-11T18:00:00Z",
+  "data": {
+    "hargaEmas": 3000000,
+    "hargaPerak": 25500,
+    "hargaBeras": 15500,
+    "takaranFitrah": 2.5
+  }
+}
