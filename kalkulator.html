@@ -738,10 +738,8 @@
                 : `<span class="status-badge belum">ℹ️ TIDAK WAJIB ZAKAT</span>`;
 
             const footerHtml = wajib
-                ? `<div class="result-total">Jumlah Zakat yang Harus Dibayarkan: ${nilaiUtama}</div>
-                   <a href="penyaluran.html" class="btn-salur">Bayar Zakat Sekarang →</a>`
-                : `<p style="margin-top:10px; font-size:0.92rem; color:#92400e;">${pesanBelumWajib}</p>
-                   <a href="penyaluran.html" class="btn-salur" style="background:#d97706;">Salurkan Infak / Sedekah →</a>`;
+                ? `<div class="result-total">Jumlah Zakat yang Harus Dibayarkan: ${nilaiUtama}</div>`
+                : `<p style="margin-top:10px; font-size:0.92rem; color:#92400e;">${pesanBelumWajib}</p>`;
 
             box.className = `result-box show ${wajib ? "wajib" : "belum-wajib"}`;
             box.innerHTML = `${badgeHtml}<table class="result-detail">${rowsHtml}</table>${footerHtml}`;
