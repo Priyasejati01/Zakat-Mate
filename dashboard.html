@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZakatMate - Dashboard Pengelolaan Zakat BAZNAS</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="loader.js"></script>
+</head>
+<body>
+
+<header>
+    <div class="logo">🌙 ZakatMate</div>
+    <nav>
+        <a href="index.html">Beranda</a>
+        <a href="dashboard.html" class="active">Dashboard</a>
+        <a href="kalkulator.html">Kalkulator</a>
+        <a href="zakat.html">Informasi Zakat</a>
+        <a href="nisab.html">Nisab</a>
+        <a href="penyaluran.html">Penyaluran</a>
+    </nav>
+</header>
+
+<section class="admin-header">
+    <div>
+        <span class="badge">📊 Monitoring Standar BAZNAS</span>
+        <h1>Dashboard ZakatMate</h1>
+        <p>Ringkasan penghimpunan, acuan nisab SK BAZNAS No. 15/2026, dan penyaluran 8 Asnaf.</p>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a href="kalkulator.html" class="btn-secondary">🧮 Hitung Zakat</a>
+        <button type="button" class="add-button" id="btnTambahTransaksi">+ Catat Transaksi</button>
+    </div>
+</section>
+
+<section class="admin-content">
+
+    <!-- 3 Kartu Ringkasan Utama -->
+    <div class="dashboard-cards">
+        <div class="dashboard-card green">
+            <span>💰</span>
+            <h3>Total Penghimpunan Zakat</h3>
+            <strong id="statTerkumpul">Rp 0</strong>
+            <p id="statJumlahMuzakki">0 transaksi muzakki tercatat</p>
+        </div>
+        <div class="dashboard-card purple">
+            <span>🤝</span>
+            <h3>Total Dana Tersalurkan</h3>
+            <strong id="statTersalurkan">Rp 0</strong>
+            <p>Distribusi program 8 Asnaf BAZNAS</p>
+        </div>
+        <div class="dashboard-card pink">
+            <span>⚖️</span>
+            <h3>Nisab Penghasilan BAZNAS</h3>
+            <strong>Rp 7.640.144 / bln</strong>
+            <p>Rp 91.681.728 / thn (85 gr emas)</p>
+        </div>
+    </div>
+
+    <!-- Panel 1: Riwayat Penghimpunan & Bukti Setor Zakat -->
+    <div class="admin-panel">
+        <div class="panel-heading">
+            <div>
+                <h2>📥 Data Penghimpunan Zakat (Muzakki)</h2>
+                <p>Data otomatis sinkron dengan transaksi dari halaman Penyaluran.</p>
+            </div>
+            <button type="button" class="btn-secondary" id="btnResetDemo" style="padding:9px 14px; font-size:13px;">Reset Data Awal</button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No. BSZ</th>
+                        <th>Tanggal</th>
+                        <th>Nama Muzakki</th>
+                        <th>Jenis Dana</th>
+                        <th>Program / Asnaf</th>
+                        <th>Nominal</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelTransaksiBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Panel 2: Rekapitulasi Penyaluran per Program / Asnaf BAZNAS -->
+    <div class="admin-panel">
+        <div class="panel-heading">
+            <div>
+                <h2>📤 Rekapitulasi Penyaluran per Program BAZNAS</h2>
+                <p>Pemantauan alokasi penyaluran dana zakat kepada golongan mustahik.</p>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Program & Target Asnaf</th>
+                        <th>Jumlah Penyaluran</th>
+                        <th>Total Dana Tersalurkan</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelRekapBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+
+<!-- Modal Tambah / Edit Transaksi -->
+<div class="modal" id="modalTransaksi">
+    <div class="modal-box">
+        <h3 id="modalTitle">Catat Transaksi Zakat</h3>
+        <form id="formModalTransaksi">
+            <input type="hidden" id="editId">
+            <div class="form-group">
+                <label for="mNama">Nama Muzakki</label>
+                <input type="text" id="mNama" required placeholder="Nama lengkap muzakki">
+            </div>
+            <div class="form-group">
+                <label for="mTanggal">Tanggal</label>
+                <input type="date" id="mTanggal" required>
+            </div>
+            <div class="form-group">
+                <label for="mJenis">Jenis Zakat / Dana</label>
+                <select id="mJenis">
+                    <option value="Zakat Penghasilan">Zakat Penghasilan</option>
+                    <option value="Zakat Perusahaan">Zakat Perusahaan</option>
+                    <option value="Zakat Perdagangan">Zakat Perdagangan</option>
+                    <option value="Zakat Emas">Zakat Emas</option>
+                    <option value="Zakat Fitrah">Zakat Fitrah</option>
+                    <option value="Infak / Sedekah">Infak / Sedekah</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="mNominal">Nominal (Rp)</label>
+                <input type="text" id="mNominal" inputmode="numeric" required placeholder="Contoh: 500.000">
+            </div>
+            <div class="form-group">
+                <label for="mProgram">Program / Asnaf Tujuan</label>
+                <select id="mProgram">
+                    <option value="Fakir & Miskin - BAZNAS Kemanusiaan">Fakir & Miskin (BAZNAS Kemanusiaan)</option>
+                    <option value="Fakir & Miskin - BAZNAS Ekonomi">Fakir & Miskin (BAZNAS Ekonomi)</option>
+                    <option value="Fisabilillah - BAZNAS Pendidikan">Fisabilillah (BAZNAS Pendidikan)</option>
+                    <option value="Fakir & Miskin - BAZNAS Kesehatan">Fakir & Miskin (BAZNAS Kesehatan)</option>
+                    <option value="Muallaf & Dakwah - BAZNAS Dakwah">Mu'allaf & Dakwah (BAZNAS Dakwah)</option>
+                    <option value="Gharimin & Ibnu Sabil">Gharimin & Ibnu Sabil</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="mStatus">Status</label>
+                <select id="mStatus">
+                    <option value="Tersalurkan">Tersalurkan</option>
+                    <option value="Terverifikasi">Terverifikasi</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" id="btnBatalModal">Batal</button>
+                <button type="submit" class="btn-calc">Simpan Data</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="toast" id="toastDashboard"></div>
+
+<footer>
+    <div>
+        <h3>🌙 ZakatMate</h3>
+        <p>Sistem informasi pengelolaan zakat sesuai pedoman BAZNAS.</p>
+    </div>
+    <p>© 2026 ZakatMate</p>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const STORAGE_KEY = "zakatmate_transaksi_baznas";
+
+    const DATA_AWAL = [
+        {
+            id: "ZKT-260101",
+            tanggal: "2026-11-20",
+            nama: "Hendra Wijaya",
+            jenis: "Zakat Penghasilan",
+            nominal: 375000,
+            program: "Fakir & Miskin - BAZNAS Kemanusiaan",
+            metode: "QRIS BAZNAS",
+            status: "Tersalurkan"
+        },
+        {
+            id: "ZKT-260102",
+            tanggal: "2026-11-22",
+            nama: "PT Berkah Nusantara",
+            jenis: "Zakat Perusahaan",
+            nominal: 4500000,
+            program: "Fakir & Miskin - BAZNAS Ekonomi",
+            metode: "Transfer Virtual Account",
+            status: "Tersalurkan"
+        },
+        {
+            id: "ZKT-260103",
+            tanggal: "2026-11-25",
+            nama: "Siti Rahmawati",
+            jenis: "Zakat Emas",
+            nominal: 3500000,
+            program: "Fisabilillah - BAZNAS Pendidikan",
+            metode: "Transfer Virtual Account",
+            status: "Tersalurkan"
+        },
+        {
+            id: "ZKT-260104",
+            tanggal: "2026-11-27",
+            nama: "Keluarga Budi Santoso",
+            jenis: "Zakat Fitrah",
+            nominal: 180000,
+            program: "Fakir & Miskin - BAZNAS Kesehatan",
+            metode: "QRIS BAZNAS",
+            status: "Tersalurkan"
+        }
+    ];
+
+    const formatRupiah = (num) => "Rp " + (Math.round(Number(num) || 0)).toLocaleString("id-ID");
+    const parseRupiah = (str) => parseInt(String(str || "").replace(/[^0-9]/g, ""), 10) || 0;
+
+    const getTransaksi = () => {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA_AWAL));
+                return [...DATA_AWAL];
+            }
+            return JSON.parse(raw);
+        } catch (_) {
+            return [...DATA_AWAL];
+        }
+    };
+
+    const saveTransaksi = (data) => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    };
+
+    const showToast = (msg) => {
+        const toast = document.getElementById("toastDashboard");
+        toast.textContent = msg;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 3000);
+    };
+
+    const renderDashboard = () => {
+        const list = getTransaksi();
+
+        // Hitung statistik kartu atas
+        const totalTerkumpul = list.reduce((acc, item) => acc + Number(item.nominal || 0), 0);
+        const totalTersalurkan = list
+            .filter((item) => item.status === "Tersalurkan")
+            .reduce((acc, item) => acc + Number(item.nominal || 0), 0);
+
+        document.getElementById("statTerkumpul").textContent = formatRupiah(totalTerkumpul);
+        document.getElementById("statTersalurkan").textContent = formatRupiah(totalTersalurkan);
+        document.getElementById("statJumlahMuzakki").textContent = `${list.length} transaksi muzakki tercatat`;
+
+        // Render Tabel Transaksi
+        const tbody = document.getElementById("tabelTransaksiBody");
+        if (list.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;">Belum ada data transaksi zakat.</td></tr>`;
+        } else {
+            tbody.innerHTML = list
+                .map((item) => `
+                    <tr>
+                        <td><strong>${item.id}</strong></td>
+                        <td>${item.tanggal}</td>
+                        <td>${item.nama}</td>
+                        <td>${item.jenis}</td>
+                        <td>${item.program}</td>
+                        <td><strong>${formatRupiah(item.nominal)}</strong></td>
+                        <td><span class="status active-status">${item.status}</span></td>
+                        <td>
+                            <button type="button" class="edit-button" data-edit="${item.id}">Edit</button>
+                            <button type="button" class="delete-button" data-delete="${item.id}">Hapus</button>
+                        </td>
+                    </tr>
+                `)
+                .join("");
+        }
+
+        // Render Tabel Rekapitulasi per Program BAZNAS
+        const rekapMap = {};
+        list.forEach((item) => {
+            if (!rekapMap[item.program]) {
+                rekapMap[item.program] = { jumlah: 0, total: 0 };
+            }
+            rekapMap[item.program].jumlah += 1;
+            rekapMap[item.program].total += Number(item.nominal || 0);
+        });
+
+        const rekapBody = document.getElementById("tabelRekapBody");
+        const programKeys = Object.keys(rekapMap);
+        if (programKeys.length === 0) {
+            rekapBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Belum ada data penyaluran.</td></tr>`;
+        } else {
+            rekapBody.innerHTML = programKeys
+                .map((prog) => `
+                    <tr>
+                        <td><strong>${prog}</strong></td>
+                        <td>${rekapMap[prog].jumlah} transaksi</td>
+                        <td><strong>${formatRupiah(rekapMap[prog].total)}</strong></td>
+                        <td><span class="status active-status">Sesuai Syariah</span></td>
+                    </tr>
+                `)
+                .join("");
+        }
+    };
+
+    // Modal Tambah / Edit
+    const modal = document.getElementById("modalTransaksi");
+    const inputMNominal = document.getElementById("mNominal");
+
+    inputMNominal.addEventListener("input", () => {
+        const val = parseRupiah(inputMNominal.value);
+        inputMNominal.value = val > 0 ? val.toLocaleString("id-ID") : "";
+    });
+
+    document.getElementById("btnTambahTransaksi").addEventListener("click", () => {
+        document.getElementById("modalTitle").textContent = "Catat Transaksi Zakat Baru";
+        document.getElementById("editId").value = "";
+        document.getElementById("formModalTransaksi").reset();
+        document.getElementById("mTanggal").value = new Date().toISOString().slice(0, 10);
+        modal.classList.add("show");
+    });
+
+    document.getElementById("btnBatalModal").addEventListener("click", () => {
+        modal.classList.remove("show");
+    });
+
+    document.getElementById("formModalTransaksi").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const editId = document.getElementById("editId").value;
+        const nama = document.getElementById("mNama").value.trim();
+        const tanggal = document.getElementById("mTanggal").value;
+        const jenis = document.getElementById("mJenis").value;
+        const nominal = parseRupiah(inputMNominal.value);
+        const program = document.getElementById("mProgram").value;
+        const status = document.getElementById("mStatus").value;
+
+        if (!nama || nominal <= 0) return;
+
+        const list = getTransaksi();
+        if (editId) {
+            const idx = list.findIndex((x) => x.id === editId);
+            if (idx !== -1) {
+                list[idx] = { ...list[idx], nama, tanggal, jenis, nominal, program, status };
+            }
+            showToast("Data transaksi berhasil diperbarui.");
+        } else {
+            list.unshift({
+                id: "ZKT-" + Date.now().toString().slice(-6),
+                tanggal,
+                nama,
+                jenis,
+                nominal,
+                program,
+                metode: "Input Admin",
+                status
+            });
+            showToast("Transaksi zakat baru berhasil ditambahkan.");
+        }
+
+        saveTransaksi(list);
+        modal.classList.remove("show");
+        renderDashboard();
+    });
+
+    // Aksi Edit & Hapus di Tabel
+    document.getElementById("tabelTransaksiBody").addEventListener("click", (e) => {
+        const editBtn = e.target.closest("[data-edit]");
+        if (editBtn) {
+            const id = editBtn.dataset.edit;
+            const item = getTransaksi().find((x) => x.id === id);
+            if (!item) return;
+
+            document.getElementById("modalTitle").textContent = `Edit Transaksi (${item.id})`;
+            document.getElementById("editId").value = item.id;
+            document.getElementById("mNama").value = item.nama;
+            document.getElementById("mTanggal").value = item.tanggal;
+            document.getElementById("mJenis").value = item.jenis;
+            inputMNominal.value = Number(item.nominal).toLocaleString("id-ID");
+            document.getElementById("mProgram").value = item.program;
+            document.getElementById("mStatus").value = item.status;
+            modal.classList.add("show");
+            return;
+        }
+
+        const delBtn = e.target.closest("[data-delete]");
+        if (delBtn) {
+            const id = delBtn.dataset.delete;
+            const filtered = getTransaksi().filter((x) => x.id !== id);
+            saveTransaksi(filtered);
+            renderDashboard();
+            showToast("Data transaksi telah dihapus.");
+        }
+    });
+
+    document.getElementById("btnResetDemo").addEventListener("click", () => {
+        saveTransaksi([...DATA_AWAL]);
+        renderDashboard();
+        showToast("Data awal BAZNAS berhasil dipulihkan.");
+    });
+
+    renderDashboard();
+});
+</script>
+</body>
+</html>

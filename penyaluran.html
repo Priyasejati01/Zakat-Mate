@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZakatMate - Penyaluran Zakat BAZNAS</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="loader.js"></script>
+    <style>
+        .program-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 45px;
+        }
+        .program-card {
+            background: #ffffff;
+            border: 1px solid #eee8e3;
+            border-radius: 20px;
+            padding: 22px;
+        }
+        .program-card h4 {
+            color: #46584e;
+            margin: 10px 0 6px;
+        }
+        .program-card p {
+            font-size: 13px;
+            color: #777f79;
+        }
+        .prefill-banner {
+            display: none;
+            background: #e5f0e5;
+            border: 1px solid #c6dec6;
+            color: #46584e;
+            padding: 14px 18px;
+            border-radius: 14px;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+        .prefill-banner.show {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">🌙 ZakatMate</div>
+    <nav>
+        <a href="index.html">Beranda</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="kalkulator.html">Kalkulator</a>
+        <a href="zakat.html">Informasi Zakat</a>
+        <a href="nisab.html">Nisab</a>
+        <a href="penyaluran.html" class="active">Penyaluran</a>
+    </nav>
+</header>
+
+<section class="page-header purple-header">
+    <span class="badge">🤝 Pendistribusian & Pendayagunaan BAZNAS</span>
+    <h1>Penyaluran Zakat</h1>
+    <p>Zakat disalurkan secara amanah, transparan, dan tepat sasaran kepada 8 golongan yang berhak (Asnaf).</p>
+</section>
+
+<section class="content">
+
+    <!-- 8 Asnaf Penerima Zakat -->
+    <div class="content-intro">
+        <h2>8 Golongan Penerima Zakat (Asnaf)</h2>
+        <p>Sesuai QS. At-Taubah ayat 60 dan pedoman pendistribusian BAZNAS, zakat hanya boleh disalurkan kepada 8 golongan berikut:</p>
+    </div>
+
+    <div class="asnaf-grid">
+        <div class="asnaf-card">
+            <span>01</span>
+            <div class="asnaf-icon">🏚️</div>
+            <h3>Fakir</h3>
+            <p>Mereka yang hampir tidak memiliki apa-apa sehingga tidak mampu memenuhi kebutuhan pokok hidup.</p>
+        </div>
+        <div class="asnaf-card">
+            <span>02</span>
+            <div class="asnaf-icon">🧺</div>
+            <h3>Miskin</h3>
+            <p>Mereka yang memiliki harta atau penghasilan, namun tidak mencukupi kebutuhan dasar sehari-hari.</p>
+        </div>
+        <div class="asnaf-card">
+            <span>03</span>
+            <div class="asnaf-icon">📋</div>
+            <h3>Amil</h3>
+            <p>Pihak atau lembaga resmi yang bertugas mengumpulkan, mengelola, dan mendistribusikan zakat.</p>
+        </div>
+        <div class="asnaf-card">
+            <span>04</span>
+            <div class="asnaf-icon">🌱</div>
+            <h3>Mu'allaf</h3>
+            <p>Mereka yang baru masuk Islam dan membutuhkan dukungan untuk menguatkan keimanan dan kemandirian.</p>
+        </div>
+        <div class="asnaf-card">
+            <span>05</span>
+            <div class="asnaf-icon">🕊️</div>
+            <h3>Riqab</h3>
+            <p>Hamba sahaya atau korban perbudakan/penindasan yang membutuhkan pembebasan diri.</p>
+        </div>
+        <div class="asnaf-card">
+            <span>06</span>
+            <div class="asnaf-icon">💳</div>
+            <h3>Gharimin</h3>
+            <p>Mereka yang terlilit utang untuk memenuhi kebutuhan hidup yang halal dan tidak sanggup melunasinya.</p>
+        </div>
+        <div class="asnaf-card">
+            <span>07</span>
+            <div class="asnaf-icon">🕌</div>
+            <h3>Fisabilillah</h3>
+            <p>Mereka yang berjuang di jalan Allah dalam bentuk dakwah, pendidikan Islam, dan kemaslahatan umat.</p>
+        </div>
+        <div class="asnaf-card">
+            <span>08</span>
+            <div class="asnaf-icon">🧳</div>
+            <h3>Ibnu Sabil</h3>
+            <p>Musafir yang kehabisan bekal dalam perjalanan yang bukan untuk maksiat.</p>
+        </div>
+    </div>
+
+    <!-- 5 Program Utama BAZNAS -->
+    <h2 class="sub-title">🎯 5 Program Utama Penyaluran BAZNAS</h2>
+    <div class="program-grid">
+        <div class="program-card">
+            <div style="font-size:28px;">🏥</div>
+            <h4>BAZNAS Kesehatan</h4>
+            <p>Layanan kesehatan gratis dan rumah sehat bagi mustahik kurang mampu.</p>
+        </div>
+        <div class="program-card">
+            <div style="font-size:28px;">🎓</div>
+            <h4>BAZNAS Pendidikan</h4>
+            <p>Beasiswa cendekia dan bantuan sarana pendidikan bagi pelajar mustahik.</p>
+        </div>
+        <div class="program-card">
+            <div style="font-size:28px;">💼</div>
+            <h4>BAZNAS Ekonomi</h4>
+            <p>Pemberdayaan UMKM mustahik (Z-Mart, Z-Chicken) agar mandiri secara ekonomi.</p>
+        </div>
+        <div class="program-card">
+            <div style="font-size:28px;">🚑</div>
+            <h4>BAZNAS Kemanusiaan</h4>
+            <p>Tanggap darurat bencana dan bantuan pangan bagi masyarakat terdampak krisis.</p>
+        </div>
+        <div class="program-card">
+            <div style="font-size:28px;">📢</div>
+            <h4>BAZNAS Dakwah & Advokasi</h4>
+            <p>Penguatan syiar Islam, pembinaan muallaf, dan advokasi hak mustahik.</p>
+        </div>
+    </div>
+
+    <!-- Form Tunaikan & Catat Penyaluran Zakat -->
+    <div class="calc-card" id="formSalurCard">
+        <h3>💳 Tunaikan & Catat Penyaluran Zakat</h3>
+        <p class="calc-hint">Data yang Anda kirim akan otomatis tercatat di halaman Dashboard ZakatMate.</p>
+
+        <div class="prefill-banner" id="prefillBanner">
+            <span id="prefillText"></span>
+            <button type="button" class="btn-secondary" id="btnPakaiHasil" style="padding:8px 14px; font-size:13px;">Gunakan Nominal Kalkulator</button>
+        </div>
+
+        <form id="formPenyaluran">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="namaMuzakki">Nama Muzakki (Pembayar Zakat)</label>
+                    <input type="text" id="namaMuzakki" required placeholder="Contoh: Ahmad Fauzi">
+                </div>
+                <div class="form-group">
+                    <label for="jenisZakatSalur">Jenis Dana</label>
+                    <select id="jenisZakatSalur">
+                        <option value="Zakat Penghasilan">Zakat Penghasilan (Profesi)</option>
+                        <option value="Zakat Perusahaan">Zakat Perusahaan</option>
+                        <option value="Zakat Perdagangan">Zakat Perdagangan</option>
+                        <option value="Zakat Emas">Zakat Emas</option>
+                        <option value="Zakat Fitrah">Zakat Fitrah</option>
+                        <option value="Infak / Sedekah">Infak / Sedekah</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="nominalSalur">Nominal (Rp)</label>
+                    <input type="text" id="nominalSalur" inputmode="numeric" required placeholder="Masukkan nominal">
+                </div>
+                <div class="form-group">
+                    <label for="programSalur">Program / Target Asnaf BAZNAS</label>
+                    <select id="programSalur">
+                        <option value="Fakir & Miskin - BAZNAS Kemanusiaan">Fakir & Miskin (BAZNAS Kemanusiaan)</option>
+                        <option value="Fakir & Miskin - BAZNAS Ekonomi">Fakir & Miskin (BAZNAS Ekonomi)</option>
+                        <option value="Fisabilillah - BAZNAS Pendidikan">Fisabilillah (BAZNAS Pendidikan)</option>
+                        <option value="Fakir & Miskin - BAZNAS Kesehatan">Fakir & Miskin (BAZNAS Kesehatan)</option>
+                        <option value="Muallaf & Dakwah - BAZNAS Dakwah">Mu'allaf & Dakwah (BAZNAS Dakwah)</option>
+                        <option value="Gharimin & Ibnu Sabil">Gharimin & Ibnu Sabil</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="metodeBayar">Metode Pembayaran</label>
+                    <select id="metodeBayar">
+                        <option value="QRIS BAZNAS">QRIS BAZNAS</option>
+                        <option value="Transfer Virtual Account">Transfer Virtual Account</option>
+                        <option value="E-Wallet (GoPay / OVO / DANA)">E-Wallet (GoPay / OVO / DANA)</option>
+                        <option value="Tunai via UPZ">Tunai via UPZ</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="doaMuzakki">Doa / Catatan (Opsional)</label>
+                    <input type="text" id="doaMuzakki" placeholder="Semoga berkah dan bermanfaat">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-calc">Konfirmasi & Salurkan Sekarang</button>
+        </form>
+
+        <div id="hasilSalur" class="result-box"></div>
+    </div>
+
+</section>
+
+<div class="toast" id="toastSalur"></div>
+
+<footer>
+    <div>
+        <h3>🌙 ZakatMate</h3>
+        <p>Penyaluran zakat sesuai 8 Asnaf dan standar BAZNAS.</p>
+    </div>
+    <p>© 2026 ZakatMate</p>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const STORAGE_KEY = "zakatmate_transaksi_baznas";
+    const parseRupiah = (str) => parseInt(String(str || "").replace(/[^0-9]/g, ""), 10) || 0;
+    const formatRupiah = (num) => "Rp " + (Math.round(Number(num) || 0)).toLocaleString("id-ID");
+
+    const inputNominal = document.getElementById("nominalSalur");
+    inputNominal.addEventListener("input", () => {
+        const val = parseRupiah(inputNominal.value);
+        inputNominal.value = val > 0 ? val.toLocaleString("id-ID") : "";
+    });
+
+    // Cek hasil perhitungan terakhir dari kalkulator.html
+    let lastCalc = null;
+    try {
+        lastCalc = JSON.parse(localStorage.getItem("zakatmate_last_calc"));
+    } catch (_) {}
+
+    if (lastCalc && lastCalc.nominal) {
+        const banner = document.getElementById("prefillBanner");
+        const text = document.getElementById("prefillText");
+        text.innerHTML = `🧮 Hasil hitungan terakhir Anda: <strong>${lastCalc.jenis}</strong> sebesar <strong>${lastCalc.nominal}</strong>`;
+        banner.classList.add("show");
+
+        document.getElementById("btnPakaiHasil").addEventListener("click", () => {
+            const angka = parseRupiah(lastCalc.nominal);
+            if (angka > 0) inputNominal.value = angka.toLocaleString("id-ID");
+
+            const selectJenis = document.getElementById("jenisZakatSalur");
+            if (!lastCalc.wajib) {
+                selectJenis.value = "Infak / Sedekah";
+            } else {
+                for (const opt of selectJenis.options) {
+                    if (opt.value.toLowerCase() === String(lastCalc.jenis).toLowerCase()) {
+                        selectJenis.value = opt.value;
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    const showToast = (msg) => {
+        const toast = document.getElementById("toastSalur");
+        toast.textContent = msg;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 3200);
+    };
+
+    document.getElementById("formPenyaluran").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const nama = document.getElementById("namaMuzakki").value.trim();
+        const jenis = document.getElementById("jenisZakatSalur").value;
+        const nominal = parseRupiah(inputNominal.value);
+        const program = document.getElementById("programSalur").value;
+        const metode = document.getElementById("metodeBayar").value;
+        const doa = document.getElementById("doaMuzakki").value.trim();
+
+        if (!nama || nominal <= 0) {
+            showToast("Mohon isi nama muzakki dan nominal yang valid.");
+            return;
+        }
+
+        let list = [];
+        try {
+            list = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        } catch (_) {}
+
+        const transaksiBaru = {
+            id: "ZKT-" + Date.now().toString().slice(-6),
+            tanggal: new Date().toISOString().slice(0, 10),
+            nama,
+            jenis,
+            nominal,
+            program,
+            metode,
+            doa,
+            status: "Tersalurkan"
+        };
+
+        list.unshift(transaksiBaru);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+
+        const hasilBox = document.getElementById("hasilSalur");
+        hasilBox.className = "result-box show result-ok";
+        hasilBox.innerHTML = `
+            <h4>✅ Bukti Setor Zakat (BSZ) Berhasil Dicatat</h4>
+            <ul>
+                <li><span>Nomor Bukti</span><strong>${transaksiBaru.id}</strong></li>
+                <li><span>Nama Muzakki</span><strong>${nama}</strong></li>
+                <li><span>Jenis Dana</span><strong>${jenis}</strong></li>
+                <li><span>Program Penyaluran</span><strong>${program}</strong></li>
+                <li><span>Metode Pembayaran</span><strong>${metode}</strong></li>
+            </ul>
+            <div class="result-total">
+                <small>Total Zakat / Infak Ditunaikan</small>
+                <strong>${formatRupiah(nominal)}</strong>
+            </div>
+            <div style="text-align:center; margin-top:14px;">
+                <a href="dashboard.html" class="btn-primary">Lihat di Dashboard →</a>
+            </div>
+        `;
+
+        showToast("Alhamdulillah, transaksi zakat berhasil dicatat!");
+        e.target.reset();
+    });
+});
+</script>
+</body>
+</html>
