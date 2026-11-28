@@ -1,10 +1,16 @@
 {
   "status": "success",
-  "waktu_update": "2026-11-11T18:00:00Z",
+  "sumber": "BAZNAS",
+  "waktu_update": "2026-11-28T13:37:00Z",
   "data": {
-    "hargaEmas": 3000000,
+    "nisabPenghasilanTahun": 91681728,
+    "nisabPenghasilanBulan": 7640144,
+    "nisabEmasGram": 85,
+    "nisabPerakGram": 595,
+    "hargaEmas": 2900000,
     "hargaPerak": 25500,
-    "hargaBeras": 15500,
-    "takaranFitrah": 2.5
+    "hargaBeras": 20000,
+    "takaranFitrah": 2.5,
+    "nominalFitrah": 50000
   }
 }

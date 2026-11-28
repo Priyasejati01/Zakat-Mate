@@ -189,14 +189,14 @@
         <div class="nisab-header-row">
             <div>
                 <h3>📌 Acuan Nisab Resmi BAZNAS</h3>
-                <p class="calc-hint" style="margin-bottom:0;">Mengacu pada SK Ketua BAZNAS No. 15 Tahun 2026 & standar 85 gram emas.</p>
+                <p class="calc-hint" style="margin-bottom:0;">Mengacu pada SK Ketua BAZNAS No. 15 Tahun 2026 &amp; standar 85 gram emas.</p>
             </div>
             <button type="button" class="btn-toggle-acuan" id="toggleAcuan">🔓 Ubah Acuan</button>
         </div>
 
         <div class="nisab-banner">
             <div class="nisab-item">
-                <span>Nisab Penghasilan & Jasa / Tahun</span>
+                <span>Nisab Penghasilan &amp; Jasa / Tahun</span>
                 <strong id="displayNisabPenghasilanTahun">Rp 91.681.728</strong>
             </div>
             <div class="nisab-item">
@@ -211,12 +211,16 @@
 
         <div class="form-grid" id="panelEditAcuan" style="display: none; margin-top: 16px;">
             <div class="form-group">
-                <label for="nisabPenghasilanTahun">Nisab Penghasilan & Jasa per Tahun (Rp)</label>
+                <label for="nisabPenghasilanTahun">Nisab Penghasilan &amp; Jasa per Tahun (Rp)</label>
                 <input type="text" id="nisabPenghasilanTahun" class="rupiah-input" inputmode="numeric" value="91.681.728" readonly>
             </div>
             <div class="form-group">
                 <label for="hargaEmas">Harga Emas 24K per Gram untuk Zakat Mal (Rp)</label>
                 <input type="text" id="hargaEmas" class="rupiah-input" inputmode="numeric" value="1.400.000" readonly>
+            </div>
+            <div class="form-group">
+                <label for="hargaPerak">Harga Perak Murni per Gram (Rp)</label>
+                <input type="text" id="hargaPerak" class="rupiah-input" inputmode="numeric" value="18.000" readonly>
             </div>
         </div>
     </div>
@@ -235,6 +239,11 @@
             <button type="button" class="tab-btn" data-group="mal" data-target="malPerusahaan">🏢 Perusahaan</button>
             <button type="button" class="tab-btn" data-group="mal" data-target="malPerdagangan">🏪 Perdagangan</button>
             <button type="button" class="tab-btn" data-group="mal" data-target="malEmas">💎 Emas</button>
+            <button type="button" class="tab-btn" data-group="mal" data-target="malPerak">🪙 Perak</button>
+            <button type="button" class="tab-btn" data-group="mal" data-target="malTabungan">🏦 Tabungan &amp; Saham</button>
+            <button type="button" class="tab-btn" data-group="mal" data-target="malPertanian">🌾 Pertanian</button>
+            <button type="button" class="tab-btn" data-group="mal" data-target="malPeternakan">🐄 Peternakan</button>
+            <button type="button" class="tab-btn" data-group="mal" data-target="malRikaz">🏺 Rikaz</button>
         </div>
 
         <!-- 1. ZAKAT PENGHASILAN -->
@@ -392,6 +401,161 @@
             </div>
         </div>
 
+        <!-- 5. ZAKAT PERAK -->
+        <div class="tab-panel" data-group="mal" id="malPerak">
+            <div class="calc-card">
+                <h3>Zakat Perak</h3>
+                <div class="baznas-info-box">
+                    Sesuai pedoman BAZNAS, zakat perak wajib dikeluarkan apabila perak simpanan mencapai nisab <strong>595 gram perak</strong> dan telah dimiliki selama <strong>1 tahun (haul)</strong> dengan kadar zakat <strong>2,5%</strong>.
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="gramPerak">Jumlah Perak Simpanan (gram)</label>
+                        <input type="number" id="gramPerak" min="0" step="0.01" placeholder="Contoh: 650">
+                    </div>
+                    <div class="form-group">
+                        <label for="haulPerak">Sudah Mencapai Haul (1 Tahun)?</label>
+                        <select id="haulPerak">
+                            <option value="ya">Ya</option>
+                            <option value="tidak">Belum</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn-calc" id="hitungPerak">Hitung Zakat</button>
+                    <button type="button" class="btn-reset" data-reset="malPerak">Reset</button>
+                </div>
+                <div id="hasilPerak" class="result-box"></div>
+            </div>
+        </div>
+
+        <!-- 6. ZAKAT TABUNGAN & SAHAM -->
+        <div class="tab-panel" data-group="mal" id="malTabungan">
+            <div class="calc-card">
+                <h3>Zakat Tabungan &amp; Saham</h3>
+                <div class="baznas-info-box">
+                    Zakat tabungan, deposito, maupun saham/investasi wajib ditunaikan apabila total nilai aset bersih mencapai nisab setara <strong>85 gram emas</strong> dan telah bertahan selama <strong>1 tahun (haul)</strong> dengan kadar <strong>2,5%</strong>.
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="saldoTabungan">Saldo Tabungan / Nilai Aset Saham &amp; Dividen (Rp)</label>
+                        <input type="text" id="saldoTabungan" class="rupiah-input" inputmode="numeric" placeholder="Masukkan nominal">
+                    </div>
+                    <div class="form-group">
+                        <label for="bungaTabungan">Bunga Bank Konvensional / Pengurang (Rp)</label>
+                        <input type="text" id="bungaTabungan" class="rupiah-input" inputmode="numeric" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="haulTabungan">Sudah Mencapai Haul (1 Tahun)?</label>
+                        <select id="haulTabungan">
+                            <option value="ya">Ya</option>
+                            <option value="tidak">Belum</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn-calc" id="hitungTabungan">Hitung Zakat</button>
+                    <button type="button" class="btn-reset" data-reset="malTabungan">Reset</button>
+                </div>
+                <div id="hasilTabungan" class="result-box"></div>
+            </div>
+        </div>
+
+        <!-- 7. ZAKAT PERTANIAN -->
+        <div class="tab-panel" data-group="mal" id="malPertanian">
+            <div class="calc-card">
+                <h3>Zakat Pertanian</h3>
+                <div class="baznas-info-box">
+                    Zakat pertanian ditunaikan langsung <strong>setiap panen</strong> (tanpa syarat haul) apabila hasil mencapai nisab <strong>653 kg gabah</strong> atau <strong>522 kg beras</strong>. Kadar zakat <strong>10%</strong> untuk tadah hujan/alami, dan <strong>5%</strong> jika menggunakan irigasi berbiaya.
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="jenisPanen">Jenis Hasil Panen</label>
+                        <select id="jenisPanen">
+                            <option value="522">Beras (Nisab 522 kg)</option>
+                            <option value="653">Gabah (Nisab 653 kg)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pengairan">Sistem Pengairan</label>
+                        <select id="pengairan">
+                            <option value="0.10">Tadah Hujan / Alami (Kadar 10%)</option>
+                            <option value="0.05">Irigasi / Berbiaya (Kadar 5%)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="hasilPanen">Total Hasil Panen (kg)</label>
+                        <input type="number" id="hasilPanen" min="0" step="0.1" placeholder="Contoh: 1000">
+                    </div>
+                    <div class="form-group">
+                        <label for="hargaPanen">Harga Jual per kg (Rp - Opsional)</label>
+                        <input type="text" id="hargaPanen" class="rupiah-input" inputmode="numeric" placeholder="0">
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn-calc" id="hitungPertanian">Hitung Zakat</button>
+                    <button type="button" class="btn-reset" data-reset="malPertanian">Reset</button>
+                </div>
+                <div id="hasilPertanian" class="result-box"></div>
+            </div>
+        </div>
+
+        <!-- 8. ZAKAT PETERNAKAN -->
+        <div class="tab-panel" data-group="mal" id="malPeternakan">
+            <div class="calc-card">
+                <h3>Zakat Peternakan</h3>
+                <div class="baznas-info-box">
+                    Zakat peternakan dikenakan atas hewan ternak yang digembalakan dan telah mencapai <strong>haul 1 tahun</strong> dengan nisab minimal <strong>40 ekor</strong> untuk kambing/domba atau <strong>30 ekor</strong> untuk sapi/kerbau.
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="jenisTernak">Jenis Hewan Ternak</label>
+                        <select id="jenisTernak">
+                            <option value="kambing">Kambing / Domba (Nisab 40 ekor)</option>
+                            <option value="sapi">Sapi / Kerbau (Nisab 30 ekor)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="jumlahTernak">Jumlah Hewan Ternak (ekor)</label>
+                        <input type="number" id="jumlahTernak" min="0" step="1" placeholder="Contoh: 45">
+                    </div>
+                    <div class="form-group">
+                        <label for="haulTernak">Sudah Mencapai Haul (1 Tahun)?</label>
+                        <select id="haulTernak">
+                            <option value="ya">Ya</option>
+                            <option value="tidak">Belum</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn-calc" id="hitungPeternakan">Hitung Zakat</button>
+                    <button type="button" class="btn-reset" data-reset="malPeternakan">Reset</button>
+                </div>
+                <div id="hasilPeternakan" class="result-box"></div>
+            </div>
+        </div>
+
+        <!-- 9. ZAKAT RIKAZ -->
+        <div class="tab-panel" data-group="mal" id="malRikaz">
+            <div class="calc-card">
+                <h3>Zakat Rikaz (Barang Temuan)</h3>
+                <div class="baznas-info-box">
+                    Zakat rikaz adalah zakat atas harta karun atau barang berharga temuan terpendam yang tidak diketahui pemiliknya. <strong>Tidak memiliki syarat nisab maupun haul</strong>, langsung ditunaikan saat ditemukan sebesar <strong>20%</strong>.
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nilaiRikaz">Taksiran Nilai Harta Temuan (Rp)</label>
+                        <input type="text" id="nilaiRikaz" class="rupiah-input" inputmode="numeric" placeholder="Masukkan nominal">
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn-calc" id="hitungRikaz">Hitung Zakat</button>
+                    <button type="button" class="btn-reset" data-reset="malRikaz">Reset</button>
+                </div>
+                <div id="hasilRikaz" class="result-box"></div>
+            </div>
+        </div>
+
     </div>
 
     <!-- ===== ZAKAT FITRAH ===== -->
@@ -466,11 +630,14 @@
         const getAcuanBaznas = () => {
             const elNisab = document.getElementById("nisabPenghasilanTahun");
             const elEmas = document.getElementById("hargaEmas");
+            const elPerak = document.getElementById("hargaPerak");
             const nisabPenghasilanTahun = parseRupiah(elNisab ? elNisab.value : "") || 91681728;
             const nisabPenghasilanBulan = Math.round(nisabPenghasilanTahun / 12);
             const hargaEmas = parseRupiah(elEmas ? elEmas.value : "") || 1400000;
+            const hargaPerak = parseRupiah(elPerak ? elPerak.value : "") || 18000;
             const nisabMalTahun = 85 * hargaEmas;
-            return { nisabPenghasilanTahun, nisabPenghasilanBulan, hargaEmas, nisabMalTahun };
+            const nisabPerakTahun = 595 * hargaPerak;
+            return { nisabPenghasilanTahun, nisabPenghasilanBulan, hargaEmas, hargaPerak, nisabMalTahun, nisabPerakTahun };
         };
 
         const updateDisplayNisab = () => {
@@ -574,10 +741,12 @@
                 const panelEdit = document.getElementById("panelEditAcuan");
                 const inNisab = document.getElementById("nisabPenghasilanTahun");
                 const inEmas = document.getElementById("hargaEmas");
+                const inPerak = document.getElementById("hargaPerak");
                 const btnToggle = document.getElementById("toggleAcuan");
                 if (panelEdit) panelEdit.style.display = acuanTerkunci ? "none" : "grid";
                 if (inNisab) inNisab.readOnly = acuanTerkunci;
                 if (inEmas) inEmas.readOnly = acuanTerkunci;
+                if (inPerak) inPerak.readOnly = acuanTerkunci;
                 if (btnToggle) btnToggle.textContent = acuanTerkunci ? "🔓 Ubah Acuan" : "🔒 Kunci Acuan BAZNAS";
                 return;
             }
@@ -738,7 +907,179 @@
                 return;
             }
 
-            // 8. Hitung Zakat Fitrah
+            // 8. Hitung Zakat Perak
+            if (e.target.closest("#hitungPerak")) {
+                const totalGram = parseFloat(document.getElementById("gramPerak").value) || 0;
+                const haul = document.getElementById("haulPerak").value === "ya";
+
+                const { hargaPerak, nisabPerakTahun } = getAcuanBaznas();
+                const nilaiRupiah = totalGram * hargaPerak;
+
+                const wajib = haul && totalGram >= 595;
+                const zakatGram = wajib ? totalGram * 0.025 : 0;
+                const zakatRupiah = zakatGram * hargaPerak;
+
+                tampilkanHasil("hasilPerak", {
+                    jenisZakat: "Zakat Perak",
+                    wajib,
+                    barisDetail: [
+                        ["Perak Simpanan", `${totalGram.toLocaleString("id-ID")} gram`],
+                        ["Taksiran Nilai Perak", formatRupiah(nilaiRupiah)],
+                        ["Batas Nisab", `595 gram (${formatRupiah(nisabPerakTahun)})`],
+                        ["Status Haul (1 Tahun)", haul ? "Terpenuhi" : "Belum Terpenuhi"]
+                    ],
+                    nilaiUtama: `${formatRupiah(zakatRupiah)} (${zakatGram.toFixed(2)} gram)`,
+                    pesanBelumWajib: !haul
+                        ? "Perak belum tersimpan selama 1 tahun (haul)."
+                        : "Perak simpanan belum mencapai nisab 595 gram."
+                });
+                return;
+            }
+
+            // 9. Hitung Zakat Tabungan & Saham
+            if (e.target.closest("#hitungTabungan")) {
+                const saldo = parseRupiah(document.getElementById("saldoTabungan").value);
+                const bunga = parseRupiah(document.getElementById("bungaTabungan").value);
+                const haul = document.getElementById("haulTabungan").value === "ya";
+
+                const hartaBersih = Math.max(0, saldo - bunga);
+                const { nisabMalTahun } = getAcuanBaznas();
+                const wajib = haul && hartaBersih >= nisabMalTahun && hartaBersih > 0;
+                const zakat = wajib ? hartaBersih * 0.025 : 0;
+
+                tampilkanHasil("hasilTabungan", {
+                    jenisZakat: "Zakat Tabungan & Saham",
+                    wajib,
+                    barisDetail: [
+                        ["Saldo / Nilai Aset Bersih", formatRupiah(hartaBersih)],
+                        ["Nisab (85 gr Emas)", formatRupiah(nisabMalTahun)],
+                        ["Status Haul (1 Tahun)", haul ? "Terpenuhi" : "Belum Terpenuhi"]
+                    ],
+                    nilaiUtama: formatRupiah(zakat),
+                    pesanBelumWajib: !haul
+                        ? "Tabungan / aset saham belum bertahan selama 1 tahun (haul)."
+                        : "Saldo / nilai aset bersih belum mencapai nisab 85 gram emas."
+                });
+                return;
+            }
+
+            // 10. Hitung Zakat Pertanian
+            if (e.target.closest("#hitungPertanian")) {
+                const nisabKg = Number(document.getElementById("jenisPanen").value);
+                const namaJenis = nisabKg === 522 ? "beras" : "gabah";
+                const kadar = parseFloat(document.getElementById("pengairan").value);
+                const hasilPanen = parseFloat(document.getElementById("hasilPanen").value) || 0;
+                const hargaKg = parseRupiah(document.getElementById("hargaPanen").value);
+
+                const wajib = hasilPanen >= nisabKg && hasilPanen > 0;
+                const zakatKg = wajib ? hasilPanen * kadar : 0;
+                const zakatRp = zakatKg * hargaKg;
+
+                const nilaiUtama = hargaKg > 0
+                    ? `${zakatKg.toLocaleString("id-ID")} kg ${namaJenis} (atau ${formatRupiah(zakatRp)})`
+                    : `${zakatKg.toLocaleString("id-ID")} kg ${namaJenis}`;
+
+                tampilkanHasil("hasilPertanian", {
+                    jenisZakat: "Zakat Pertanian",
+                    wajib,
+                    barisDetail: [
+                        ["Total Hasil Panen", `${hasilPanen.toLocaleString("id-ID")} kg ${namaJenis}`],
+                        ["Batas Nisab", `${nisabKg} kg ${namaJenis}`],
+                        ["Kadar Zakat", `${kadar * 100}% (${kadar === 0.1 ? "Tadah Hujan / Alami" : "Irigasi Berbiaya"})`]
+                    ],
+                    nilaiUtama,
+                    pesanBelumWajib: `Hasil panen belum mencapai nisab ${nisabKg} kg ${namaJenis}.`
+                });
+                return;
+            }
+
+            // 11. Hitung Zakat Peternakan
+            if (e.target.closest("#hitungPeternakan")) {
+                const jenis = document.getElementById("jenisTernak").value;
+                const jumlah = Math.max(0, parseInt(document.getElementById("jumlahTernak").value, 10) || 0);
+                const haul = document.getElementById("haulTernak").value === "ya";
+
+                let wajib = false;
+                let zakatTernak = "";
+                const labelHewan = jenis === "kambing" ? "Kambing / Domba" : "Sapi / Kerbau";
+                const nisabTernak = jenis === "kambing" ? "40 ekor" : "30 ekor";
+
+                if (haul) {
+                    if (jenis === "kambing" && jumlah >= 40) {
+                        wajib = true;
+                        if (jumlah <= 120) zakatTernak = "1 ekor kambing/domba";
+                        else if (jumlah <= 200) zakatTernak = "2 ekor kambing/domba";
+                        else if (jumlah <= 399) zakatTernak = "3 ekor kambing/domba";
+                        else {
+                            const ekor = Math.floor(jumlah / 100);
+                            zakatTernak = `${ekor} ekor kambing/domba (1 ekor tiap kelipatan 100)`;
+                        }
+                    } else if (jenis === "sapi" && jumlah >= 30) {
+                        wajib = true;
+                        if (jumlah <= 39) zakatTernak = "1 ekor sapi tabi' (umur 1 tahun)";
+                        else if (jumlah <= 59) zakatTernak = "1 ekor sapi musinnah (umur 2 tahun)";
+                        else if (jumlah <= 69) zakatTernak = "2 ekor sapi tabi' (umur 1 tahun)";
+                        else if (jumlah <= 79) zakatTernak = "1 ekor sapi tabi' (1 thn) & 1 ekor musinnah (2 thn)";
+                        else {
+                            // Kombinasi optimal kelipatan 30 (tabi') dan 40 (musinnah)
+                            let bestTotal = -1;
+                            let bestTabi = 0;
+                            let bestMusinnah = 0;
+                            for (let m = 0; m * 40 <= jumlah; m++) {
+                                const t = Math.floor((jumlah - m * 40) / 30);
+                                const covered = m * 40 + t * 30;
+                                if (covered > bestTotal) {
+                                    bestTotal = covered;
+                                    bestTabi = t;
+                                    bestMusinnah = m;
+                                }
+                            }
+                            const bagian = [];
+                            if (bestTabi > 0) bagian.push(`${bestTabi} ekor sapi tabi' (1 thn)`);
+                            if (bestMusinnah > 0) bagian.push(`${bestMusinnah} ekor sapi musinnah (2 thn)`);
+                            zakatTernak = bagian.join(" & ");
+                        }
+                    }
+                }
+
+                tampilkanHasil("hasilPeternakan", {
+                    jenisZakat: "Zakat Peternakan",
+                    wajib,
+                    barisDetail: [
+                        ["Jenis Ternak", labelHewan],
+                        ["Jumlah Ternak", `${jumlah.toLocaleString("id-ID")} ekor`],
+                        ["Batas Nisab", nisabTernak],
+                        ["Status Haul (1 Tahun)", haul ? "Terpenuhi" : "Belum Terpenuhi"]
+                    ],
+                    nilaiUtama: zakatTernak,
+                    pesanBelumWajib: !haul
+                        ? "Hewan ternak belum dimiliki selama 1 tahun (haul)."
+                        : `Jumlah ternak belum mencapai nisab minimal (${nisabTernak}).`
+                });
+                return;
+            }
+
+            // 12. Hitung Zakat Rikaz
+            if (e.target.closest("#hitungRikaz")) {
+                const nilai = parseRupiah(document.getElementById("nilaiRikaz").value);
+                const wajib = nilai > 0;
+                const zakat = wajib ? nilai * 0.20 : 0;
+
+                tampilkanHasil("hasilRikaz", {
+                    jenisZakat: "Zakat Rikaz",
+                    wajib,
+                    barisDetail: [
+                        ["Taksiran Nilai Harta Temuan", formatRupiah(nilai)],
+                        ["Syarat Nisab & Haul", "Tidak ada (langsung saat ditemukan)"],
+                        ["Kadar Zakat", "20%"]
+                    ],
+                    nilaiUtama: formatRupiah(zakat),
+                    pesanBelumWajib: "Masukkan taksiran nilai harta temuan terlebih dahulu."
+                });
+                return;
+            }
+
+            // 13. Hitung Zakat Fitrah
             if (e.target.closest("#hitungFitrah")) {
                 const metode = document.getElementById("metodeFitrah").value;
                 const jiwa = Math.max(1, parseInt(document.getElementById("jumlahJiwa").value, 10) || 1);

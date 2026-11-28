@@ -3,9 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZakatMate - Beranda</title>
+    <title>ZakatMate - Beranda Panduan &amp; Kalkulator Zakat BAZNAS</title>
     <link rel="stylesheet" href="style.css">
     <script src="loader.js"></script>
+    <style>
+        /* Menggunakan Palet Hijau Sage Bawaan style.css (#769b81, #526d5d, #dcebdc, #43554b) */
+        .hero.baznas-hero {
+            background: linear-gradient(135deg, #fffaf7 0%, #edf5ee 100%);
+            border-bottom: 1px solid #e3eee3;
+        }
+        .baznas-hero .badge {
+            background: #e5f0e5;
+            color: #4e6858;
+            border: 1px solid #dce7df;
+        }
+        .baznas-hero h1 span {
+            color: #5f846a;
+        }
+
+        /* Kartu Highlight BAZNAS di Kanan Hero (Selaras Warna Footer & Sage) */
+        .hero-card.baznas-card {
+            width: 360px;
+            background: linear-gradient(160deg, #526d5d 0%, #43554b 100%);
+            color: #ffffff;
+            border-radius: 35px;
+            padding: 38px 30px;
+            box-shadow: 0 20px 50px rgba(80, 100, 85, 0.16);
+        }
+        .hero-card.baznas-card .moon {
+            font-size: 64px;
+            margin-bottom: 14px;
+        }
+        .hero-card.baznas-card .card-tag {
+            display: inline-block;
+            background: rgba(220, 235, 220, 0.2);
+            border: 1px solid rgba(220, 235, 220, 0.35);
+            color: #edf5ee;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 999px;
+            margin-bottom: 12px;
+            letter-spacing: 0.4px;
+        }
+        .hero-card.baznas-card h3 {
+            color: #ffffff;
+            font-size: 23px;
+            margin-bottom: 10px;
+        }
+        .hero-card.baznas-card p {
+            color: #dcebdc;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .pilar-baznas {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+        .pilar-baznas span {
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(220, 235, 220, 0.3);
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 6px 11px;
+            border-radius: 999px;
+        }
+
+        /* Strip Acuan Cepat SK BAZNAS */
+        .baznas-quick-strip {
+            padding: 45px 10% 10px;
+            background: #ffffff;
+        }
+        .quick-strip-box {
+            background: #f3f8f1;
+            border: 1px solid #dce7df;
+            border-left: 5px solid #769b81;
+            border-radius: 22px;
+            padding: 24px 28px;
+        }
+        .quick-strip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .quick-strip-header h3 {
+            color: #43564b;
+            font-size: 18px;
+        }
+        .quick-strip-header span {
+            font-size: 12px;
+            font-weight: bold;
+            color: #4e6858;
+            background: #dcebdc;
+            padding: 5px 12px;
+            border-radius: 999px;
+        }
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+        .quick-item {
+            background: #ffffff;
+            border: 1px solid #e3eee3;
+            border-radius: 15px;
+            padding: 15px 17px;
+        }
+        .quick-item small {
+            display: block;
+            color: #707a74;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+        .quick-item strong {
+            color: #526d5d;
+            font-size: 15px;
+        }
+
+        /* Grid 4 Kartu Layanan */
+        .baznas-cards {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .info-card.sage {
+            background: #edf5ee;
+            border: 1px solid #dce7df;
+        }
+
+        @media (max-width: 900px) {
+            .quick-grid,
+            .baznas-cards {
+                grid-template-columns: 1fr;
+            }
+            .hero-card.baznas-card {
+                width: 100%;
+                max-width: 420px;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -19,72 +159,110 @@
         <a href="zakat.html">Informasi Zakat</a>
         <a href="nisab.html">Nisab</a>
         <a href="penyaluran.html">Penyaluran</a>
-       
     </nav>
 </header>
 
-<section class="hero">
+<section class="hero baznas-hero">
     <div class="hero-text">
-        <span class="badge">✨ Panduan Zakat Digital</span>
+        <span class="badge">🕌 Mengacu Pedoman Resmi BAZNAS RI</span>
 
         <h1>
-            Menunaikan Zakat<br>
-            Jadi Lebih <span>Mudah</span>
+            Tunaikan Zakat<br>
+            Sesuai Standar <span>BAZNAS</span>
         </h1>
 
         <p>
-            ZakatMate nemenin kamu belajar soal zakat, nisab, sampai ke mana zakat disalurkan, pakai bahasa yang gampang dicerna.
+            ZakatMate membantu kamu memahami ketentuan zakat, mengecek batas nisab SK Ketua BAZNAS No. 15 Tahun 2026, hingga menghitung kewajiban Zakat Mal dan Zakat Fitrah secara praktis.
         </p>
 
         <div class="hero-buttons">
-            <a href="zakat.html" class="btn-primary">Pelajari Zakat</a>
-            <a href="nisab.html" class="btn-secondary">Lihat Nisab</a>
+            <a href="kalkulator.html" class="btn-primary">🧮 Hitung Zakat Sekarang</a>
+            <a href="nisab.html" class="btn-secondary">⚖️ Lihat Standar Nisab</a>
         </div>
     </div>
 
-    <div class="hero-card">
+    <div class="hero-card baznas-card">
         <div class="moon">🌙</div>
-        <h3>Zakat dengan<br>penuh keberkahan</h3>
+        <span class="card-tag">CAHAYA ZAKAT</span>
+        <h3>Keajaiban Muzaki<br>&amp; Mustahik</h3>
         <p>
-            Berbagi sebagian rezeki buat sesama, sekalian nyempurnain ibadah.
+            Menyucikan harta dan memberdayakan sesama dengan prinsip tata kelola zakat nasional.
         </p>
+        <div class="pilar-baznas">
+            <span>✅ Aman Syar'i</span>
+            <span>📜 Aman Regulasi</span>
+            <span>🇮🇩 Aman NKRI</span>
+        </div>
+    </div>
+</section>
+
+<!-- Ringkasan Acuan Resmi BAZNAS -->
+<section class="baznas-quick-strip">
+    <div class="quick-strip-box">
+        <div class="quick-strip-header">
+            <h3>📌 Acuan Nisab &amp; Ketentuan BAZNAS Terkini</h3>
+            <span>SK Ketua BAZNAS No. 15 Tahun 2026</span>
+        </div>
+        <div class="quick-grid">
+            <div class="quick-item">
+                <small>Nisab Penghasilan &amp; Jasa</small>
+                <strong>Rp 91.681.728 / thn (Rp 7.640.144 / bln)</strong>
+            </div>
+            <div class="quick-item">
+                <small>Nisab Zakat Mal (Emas, Dagang, Tabungan)</small>
+                <strong>Setara 85 Gram Emas (Kadar 2,5%)</strong>
+            </div>
+            <div class="quick-item">
+                <small>Besaran Zakat Fitrah</small>
+                <strong>2,5 kg / 3,5 L Beras (Rp 45.000 / jiwa)</strong>
+            </div>
+        </div>
     </div>
 </section>
 
 <section class="features">
     <div class="section-title">
         <span>📚</span>
-        <h2>Yang Bisa Kamu Pelajari</h2>
-        <p>Penjelasan singkat biar zakat nggak terasa ribet.</p>
+        <h2>Layanan &amp; Panduan Zakat BAZNAS</h2>
+        <p>Pilih menu berikut untuk menghitung zakat atau mempelajari ketentuan resminya.</p>
     </div>
 
-    <div class="card-container">
+    <div class="card-container baznas-cards">
 
-        <div class="info-card pink">
-            <div class="icon">🕌</div>
-            <h3>Informasi Zakat</h3>
+        <div class="info-card sage">
+            <div class="icon">🧮</div>
+            <h3>Kalkulator Zakat BAZNAS</h3>
             <p>
-                Kenalan sama zakat: apa itu, apa aja jenisnya, dan siapa yang wajib bayar.
+                Hitung Zakat Penghasilan, Perusahaan, Perdagangan, Emas, Perak, Tabungan, Pertanian, Peternakan, Rikaz, hingga Zakat Fitrah.
             </p>
-            <a href="zakat.html">Pelajari →</a>
+            <a href="kalkulator.html">Buka Kalkulator →</a>
         </div>
 
         <div class="info-card green">
             <div class="icon">💰</div>
-            <h3>Informasi Nisab</h3>
+            <h3>Ketentuan Nisab &amp; Kadar</h3>
             <p>
-                Cari tahu nisab itu apa dan kenapa jadi patokan wajib zakat.
+                Cek tabel lengkap batas minimal harta wajib zakat (nisab), syarat haul 1 tahun, serta kadar zakat sesuai pedoman BAZNAS.
             </p>
-            <a href="nisab.html">Pelajari →</a>
+            <a href="nisab.html">Lihat Tabel Nisab →</a>
+        </div>
+
+        <div class="info-card pink">
+            <div class="icon">🕌</div>
+            <h3>Informasi &amp; Dasar Zakat</h3>
+            <p>
+                Pelajari pengertian zakat, perbedaan Zakat Mal dan Zakat Fitrah, serta 6 syarat wajib harta yang dikenai zakat.
+            </p>
+            <a href="zakat.html">Pelajari Zakat →</a>
         </div>
 
         <div class="info-card purple">
             <div class="icon">🤲</div>
-            <h3>Penyaluran Zakat</h3>
+            <h3>Penyaluran 8 Golongan (Asnaf)</h3>
             <p>
-                Cari tahu siapa aja yang berhak nerima zakat menurut ajaran Islam.
+                Ketahui siapa saja 8 golongan mustahik yang berhak menerima dana zakat sesuai QS. At-Taubah ayat 60.
             </p>
-            <a href="penyaluran.html">Pelajari →</a>
+            <a href="penyaluran.html">Lihat Penyaluran →</a>
         </div>
 
     </div>
@@ -102,7 +280,7 @@
 <footer>
     <div>
         <h3>🌙 ZakatMate</h3>
-        <p>Belajar zakat dengan cara yang sederhana.</p>
+        <p>Edukasi &amp; Kalkulator Zakat Digital Mengacu Pedoman BAZNAS.</p>
     </div>
 
     <p>© 2026 ZakatMate</p>

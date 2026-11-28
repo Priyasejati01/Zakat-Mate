@@ -1,473 +1,357 @@
-document.addEventListener("DOMContentLoaded", () => {
-    // ==========================================
-    // 1. HELPER FORMAT RUPIAH & PARSING ANGKA
-    // ==========================================
-    const formatRupiah = (angka) => {
-        const nilai = Math.round(Number(angka) || 0);
-        return "Rp " + nilai.toLocaleString("id-ID");
-    };
+function el(id) { return document.getElementById(id); }
+function num(id) { return Number(el(id).value) || 0; }
 
-    const parseRupiah = (str) => {
-        if (!str) return 0;
-        const bersih = String(str).replace(/[^0-9]/g, "");
-        return parseInt(bersih, 10) || 0;
-    };
+function formatRupiah(angka) {
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0
+    }).format(angka);
+}
 
-    const pasangFormatRupiah = (input) => {
-        input.addEventListener("input", () => {
-            const angka = parseRupiah(input.value);
-            input.value = angka > 0 ? angka.toLocaleString("id-ID") : "";
-            if (input.id === "hargaEmas" || input.id === "hargaPerak") {
-                updateInfoNisab();
-            }
-        });
-    };
+if (el("listPengertian")) {
+    const data = getData();
+    const warna = ["pink", "green", "purple"];
 
-    document.querySelectorAll(".rupiah-input").forEach(pasangFormatRupiah);
+    el("listPengertian").innerHTML = data.pengertian.map(function (p) {
+        return '<div class="content-card">' +
+            '<div class="big-icon">🕌</div>' +
+            '<div><h2>' + esc(p.judul) + '</h2><p>' + esc(p.isi) + '</p></div>' +
+            '</div>';
+    }).join("") || '<p class="empty">Belum ada data.</p>';
 
-    // ==========================================
-    // 2. ACUAN NISAB REAL-TIME (STANDAR BAZNAS)
-    // ==========================================
-    const inputHargaEmas = document.getElementById("hargaEmas");
-    const inputHargaPerak = document.getElementById("hargaPerak");
+    el("listJenis").innerHTML = data.jenis.map(function (j, i) {
+        return '<div class="info-card ' + warna[i % 3] + '">' +
+            '<div class="icon">' + esc(j.ikon || "💰") + '</div>' +
+            '<h3>' + esc(j.judul) + '</h3>' +
+            '<p>' + esc(j.deskripsi) + '</p>' +
+            '</div>';
+    }).join("") || '<p class="empty">Belum ada data.</p>';
 
-    // Sinkronisasi jika data.js menyediakan nilai default
-    if (window.DATA_ZAKAT?.hargaEmas) {
-        inputHargaEmas.value = Number(window.DATA_ZAKAT.hargaEmas).toLocaleString("id-ID");
+    el("listGolongan").innerHTML = data.golongan.map(function (g, i) {
+        const no = String(i + 1).padStart(2, "0");
+        return '<div class="asnaf-card">' +
+            '<span>' + no + '</span>' +
+            '<div class="asnaf-icon">' + esc(g.ikon || "🤲") + '</div>' +
+            '<h3>' + esc(g.nama) + '</h3>' +
+            '<p>' + esc(g.deskripsi) + '</p>' +
+            '</div>';
+    }).join("") || '<p class="empty">Belum ada data.</p>';
+}
+
+if (el("tabFitrah")) {
+
+    const NISAB_EMAS = 85;    
+    const NISAB_PERAK = 595;  
+
+    // Ambil data default/lokal dulu dari localStorage (sebagai fallback)
+    const set = getData().pengaturan;
+    el("hargaEmas").value = set.hargaEmas;
+    el("hargaPerak").value = set.hargaPerak;
+    el("hargaBeras").value = set.hargaBeras;
+    el("takaranFitrah").value = set.takaranFitrah;
+
+    function updateInfoNisab() {
+        const n = NISAB_EMAS * num("hargaEmas");
+        el("infoNisab").innerHTML =
+            "Dengan harga emas segini, batas wajib zakat (nisab) sekitar <strong>" + formatRupiah(n) + "</strong>" +
+            " per tahun, atau <strong>" + formatRupiah(n / 12) + "</strong> per bulan.";
     }
-    if (window.DATA_ZAKAT?.hargaPerak) {
-        inputHargaPerak.value = Number(window.DATA_ZAKAT.hargaPerak).toLocaleString("id-ID");
-    }
-
-    const getNisab = () => {
-        const hargaEmas = parseRupiah(inputHargaEmas.value) || 1400000;
-        const hargaPerak = parseRupiah(inputHargaPerak.value) || 18000;
-        const nisabTahun = 85 * hargaEmas;
-        const nisabBulan = nisabTahun / 12;
-        const nisabPerak = 595 * hargaPerak;
-        return { hargaEmas, hargaPerak, nisabTahun, nisabBulan, nisabPerak };
-    };
-
-    const updateInfoNisab = () => {
-        const { nisabTahun, nisabBulan, nisabPerak } = getNisab();
-        document.getElementById("displayNisabTahun").textContent = formatRupiah(nisabTahun);
-        document.getElementById("displayNisabBulan").textContent = formatRupiah(nisabBulan);
-        document.getElementById("displayNisabPerak").textContent = formatRupiah(nisabPerak);
-    };
-
     updateInfoNisab();
+    el("hargaEmas").addEventListener("input", updateInfoNisab);
 
-    // ==========================================
-    // 3. NAVIGASI TAB UTAMA & SUB-TAB
-    // ==========================================
-    document.querySelectorAll(".tab-btn").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const group = btn.dataset.group;
-            const targetId = btn.dataset.target;
+    // =========================================================
+    // FUNGSI AJAX: MENGAMBIL HARGA TERBARU DARI api-harga.json
+    // =========================================================
+    async function ambilHargaTerbaru() {
+        try {
+            const response = await fetch('api-harga.json');
+            if (!response.ok) throw new Error(`Status HTTP: ${response.status}`);
+            
+            const result = await response.json();
+            const pengaturan = result.data;
+            
+            // Timpa harga lokal dengan harga dari server/API
+            el("hargaEmas").value = pengaturan.hargaEmas;
+            el("hargaPerak").value = pengaturan.hargaPerak;
+            el("hargaBeras").value = pengaturan.hargaBeras;
+            if(pengaturan.takaranFitrah) el("takaranFitrah").value = pengaturan.takaranFitrah;
+            
+            updateInfoNisab(); // Update teks info nisab dengan harga baru
+            console.log("AJAX Sukses: Harga acuan berhasil di-update dari server.");
+        } catch (error) {
+            console.warn("Info AJAX: Menggunakan harga pengaturan admin/lokal karena file JSON belum ada atau error.", error.message);
+        }
+    }
 
-            document.querySelectorAll(`.tab-btn[data-group="${group}"]`).forEach((b) => {
-                b.classList.remove("active");
-            });
-            document.querySelectorAll(`.tab-panel[data-group="${group}"]`).forEach((p) => {
-                p.classList.remove("show");
-            });
+    // Eksekusi AJAX
+    ambilHargaTerbaru();
+    // =========================================================
 
+    // Sistem Navigasi Tab Kalkulator
+    document.querySelectorAll(".tab-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            const g = btn.dataset.group;
+            document.querySelectorAll('.tab-btn[data-group="' + g + '"]')
+                .forEach(function (b) { b.classList.remove("active"); });
+            document.querySelectorAll('.tab-panel[data-group="' + g + '"]')
+                .forEach(function (p) { p.classList.remove("show"); });
             btn.classList.add("active");
-            const targetPanel = document.getElementById(targetId);
-            if (targetPanel) targetPanel.classList.add("show");
+            el(btn.dataset.target).classList.add("show");
         });
     });
 
-    // ==========================================
-    // 4. INTERAKSI DINAMIS FORM BAZNAS
-    // ==========================================
-    // Ubah label Penghasilan (Per Bulan vs Per Tahun)
-    const periodePenghasilan = document.getElementById("periodePenghasilan");
-    periodePenghasilan.addEventListener("change", () => {
-        const teks = periodePenghasilan.value === "bulan" ? "per Bulan" : "per Tahun";
-        document.getElementById("labelGaji").textContent = `Penghasilan / Gaji ${teks} (Rp)`;
-        document.getElementById("labelGajiLain").textContent = `Penghasilan Lain / Bonus ${teks} (Rp)`;
-        document.getElementById("labelCicilan").textContent = `Utang / Cicilan Kebutuhan Pokok ${teks} (Rp)`;
+    // Fungsi untuk menampilkan UI hasil kalkulator seragam
+    function tampil(id, ok, judul, baris, total, catatan) {
+        const box = el(id);
+        box.className = "result-box show " + (ok ? "result-ok" : "result-no");
+        let html = "<h4>" + judul + "</h4><ul>" +
+            baris.map(function (b) {
+                return "<li><span>" + b[0] + "</span><strong>" + b[1] + "</strong></li>";
+            }).join("") + "</ul>";
+        if (total) {
+            html += '<div class="result-total"><small>Zakat yang harus kamu keluarin</small>' + total + "</div>";
+        }
+        if (catatan) html += '<p class="result-note">' + catatan + "</p>";
+        box.innerHTML = html;
+    }
+
+    function wajibIsiAngka(id, nilai, pesan) {
+        if (nilai <= 0) {
+            tampil(id, false, "Eits, belum lengkap nih", [], "", pesan);
+            return false;
+        }
+        return true;
+    }
+    
+    el("hitungFitrah").addEventListener("click", function () {
+        const jiwa = num("jumlahJiwa"), takaran = num("takaranFitrah"), harga = num("hargaBeras");
+        if (!wajibIsiAngka("hasilFitrah", jiwa * takaran * harga, "Isi dulu dong jumlah orang, takaran beras, sama harga berasnya.")) return;
+        const kg = jiwa * takaran;
+        tampil("hasilFitrah", true, "Zakat Fitrah",
+            [["Jumlah orang", jiwa + " orang"],
+             ["Beras per orang", takaran + " kg"],
+             ["Total beras", kg.toLocaleString("id-ID") + " kg"],
+             ["Harga beras per kg", formatRupiah(harga)]],
+            "<strong>" + formatRupiah(kg * harga) + "</strong>",
+            "Zakat fitrah bisa dibayar pakai beras atau uang seharga beras, sebelum salat Idulfitri ya.");
     });
 
-    // Ubah input Perusahaan (Jasa vs Dagang/Industri)
-    const jenisPerusahaan = document.getElementById("jenisPerusahaan");
-    jenisPerusahaan.addEventListener("change", () => {
-        const isJasa = jenisPerusahaan.value === "jasa";
-        document.getElementById("groupLabaJasa").style.display = isJasa ? "block" : "none";
-        document.getElementById("groupAktiva").style.display = isJasa ? "none" : "block";
-        document.getElementById("groupPasiva").style.display = isJasa ? "none" : "block";
-    });
-
-    // Tombol Reset per Panel
-    document.querySelectorAll(".btn-reset").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const panel = document.getElementById(btn.dataset.reset);
-            if (!panel) return;
-            panel.querySelectorAll("input").forEach((inp) => {
-                if (inp.id === "jumlahJiwa") inp.value = "1";
-                else if (inp.id === "takaranFitrah") inp.value = "2.5";
-                else if (inp.id === "hargaBeras") inp.value = "15.000";
-                else inp.value = "";
-            });
-            panel.querySelectorAll("select").forEach((sel) => {
-                sel.selectedIndex = 0;
-                sel.dispatchEvent(new Event("change"));
-            });
-            const res = panel.querySelector(".result-box");
-            if (res) {
-                res.className = "result-box";
-                res.innerHTML = "";
-            }
-        });
-    });
-
-    // ==========================================
-    // 5. RENDER HASIL STANDAR BAZNAS
-    // ==========================================
-    const tampilkanHasil = (elementId, { wajib, barisDetail, nilaiUtama, catatanTambahan, jenisZakat }) => {
-        const box = document.getElementById(elementId);
-        const rowsHtml = barisDetail
-            .map(([label, val]) => `<tr><td>${label}</td><td>${val}</td></tr>`)
-            .join("");
-
-        const statusBadge = wajib
-            ? `<span class="status-badge wajib">✅ WAJIB ZAKAT</span>`
-            : `<span class="status-badge belum">ℹ️ BELUM WAJIB ZAKAT</span>`;
-
-        const pesanBawah = wajib
-            ? `<div class="result-total">Zakat yang Harus Ditunaikan: ${nilaiUtama}</div>
-               <a href="penyaluran.html" class="btn-salur">Tunaikan Zakat Sekarang →</a>`
-            : `<p style="margin-top:10px; font-size:0.92rem; color:#92400e;">${catatanTambahan}</p>
-               <a href="penyaluran.html" class="btn-salur" style="background:#d97706;">Salurkan Infak / Sedekah →</a>`;
-
-        box.className = `result-box show ${wajib ? "wajib" : "belum-wajib"}`;
-        box.innerHTML = `
-            ${statusBadge}
-            <table class="result-detail">${rowsHtml}</table>
-            ${pesanBawah}
-        `;
-
-        // Simpan riwayat terakhir untuk integrasi dashboard/penyaluran
-        localStorage.setItem("zakatmate_last_calc", JSON.stringify({
-            jenis: jenisZakat,
-            wajib,
-            nominal: nilaiUtama,
-            waktu: new Date().toISOString()
-        }));
-    };
-
-    // ==========================================
-    // 6. RUMUS PERHITUNGAN TIAP JENIS ZAKAT
-    // ==========================================
-
-    // A. ZAKAT PENGHASILAN
-    document.getElementById("hitungPenghasilan").addEventListener("click", () => {
-        const periode = periodePenghasilan.value;
-        const gaji = parseRupiah(document.getElementById("gaji").value);
-        const gajiLain = parseRupiah(document.getElementById("gajiLain").value);
-        const cicilan = parseRupiah(document.getElementById("cicilan").value);
-
-        const totalBersih = Math.max(0, gaji + gajiLain - cicilan);
-        const { nisabTahun, nisabBulan } = getNisab();
-        const nisabBerlaku = periode === "bulan" ? nisabBulan : nisabTahun;
-        const wajib = totalBersih >= nisabBerlaku && totalBersih > 0;
-        const zakat = wajib ? totalBersih * 0.025 : 0;
-
-        tampilkanHasil("hasilPenghasilan", {
-            jenisZakat: "Zakat Penghasilan",
-            wajib,
-            barisDetail: [
-                ["Periode Hitung", periode === "bulan" ? "Bulanan" : "Tahunan"],
-                ["Total Penghasilan Bersih", formatRupiah(totalBersih)],
-                [`Nisab (${periode === "bulan" ? "85 gr Emas ÷ 12" : "85 gr Emas"})`, formatRupiah(nisabBerlaku)],
-                ["Kadar Zakat", "2,5%"]
-            ],
-            nilaiUtama: formatRupiah(zakat),
-            catatanTambahan: "Penghasilan bersih Anda belum mencapai batas nisab. Anda tetap dapat berinfak atau bersedekah."
-        });
-    });
-
-    // B. ZAKAT PERUSAHAAN
-    document.getElementById("hitungPerusahaan").addEventListener("click", () => {
-        const jenis = jenisPerusahaan.value;
-        const haul = document.getElementById("haulPerusahaan").value === "ya";
-        const { nisabTahun } = getNisab();
-
-        let objekZakat = 0;
-        let detailKhusus = [];
-
-        if (jenis === "jasa") {
-            objekZakat = parseRupiah(document.getElementById("labaJasa").value);
-            detailKhusus.push(["Jenis Perusahaan", "Perusahaan Jasa"]);
-            detailKhusus.push(["Laba Bersih / Pendapatan", formatRupiah(objekZakat)]);
+    el("hitungPenghasilan").addEventListener("click", function () {
+        const gaji = num("gaji"), lain = num("gajiLain"), cicilan = num("cicilan");
+        const bersih = Math.max(gaji + lain - cicilan, 0);
+        if (!wajibIsiAngka("hasilPenghasilan", gaji + lain, "Isi dulu dong gaji atau penghasilanmu per bulan.")) return;
+        const nisabBulan = NISAB_EMAS * num("hargaEmas") / 12;
+        const baris = [["Penghasilan yang dihitung", formatRupiah(bersih)],
+                       ["Batas wajib zakat per bulan", formatRupiah(nisabBulan)]];
+        if (bersih >= nisabBulan) {
+            tampil("hasilPenghasilan", true, "Kamu udah wajib zakat nih", baris,
+                "<strong>" + formatRupiah(bersih * 0.025) + "</strong>",
+                "Besarnya 2,5% dari penghasilan per bulan.");
         } else {
-            const aktiva = parseRupiah(document.getElementById("aktivaLancar").value);
-            const pasiva = parseRupiah(document.getElementById("pasivaLancar").value);
-            objekZakat = Math.max(0, aktiva - pasiva);
-            detailKhusus.push(["Jenis Perusahaan", "Dagang / Industri"]);
-            detailKhusus.push(["Aktiva Lancar − Pasiva Lancar", formatRupiah(objekZakat)]);
+            tampil("hasilPenghasilan", false, "Belum wajib zakat", baris, "",
+                "Penghasilanmu belum nyampe batas wajib zakat, jadi bulan ini belum perlu zakat. Santai aja.");
+        }
+    });
+
+    el("hitungEmas").addEventListener("click", function () {
+        const emas = el("jenisLogam").value === "emas";
+        const gram = num("gramLogam");
+        const harga = emas ? num("hargaEmas") : num("hargaPerak");
+        const nisab = emas ? NISAB_EMAS : NISAB_PERAK;
+        if (!wajibIsiAngka("hasilEmas", gram * harga, "Isi dulu beratnya, terus cek harga per gram di atas udah keisi ya.")) return;
+        const nilai = gram * harga;
+        const baris = [["Berat yang kamu punya", gram + " gram"],
+                       ["Batas wajib zakat", nisab + " gram"],
+                       ["Nilai harta", formatRupiah(nilai)]];
+        if (gram < nisab) {
+            tampil("hasilEmas", false, "Belum wajib zakat", baris, "", "Beratnya belum nyampe batas wajib zakat.");
+        } else if (el("haulLogam").value !== "ya") {
+            tampil("hasilEmas", false, "Belum wajib zakat", baris, "", "Beratnya udah cukup, tapi belum genap setahun disimpan. Hitung lagi pas udah setahun ya.");
+        } else {
+            tampil("hasilEmas", true, "Kamu udah wajib zakat nih", baris,
+                "<strong>" + formatRupiah(nilai * 0.025) + "</strong>",
+                "Besarnya 2,5% dari nilai hartamu.");
+        }
+    });
+    
+    el("hitungPertanian").addEventListener("click", function () {
+        const panen = num("hasilPanen"), nisab = Number(el("jenisPanen").value);
+        const persen = Number(el("pengairan").value), harga = num("hargaPanen");
+        if (!wajibIsiAngka("hasilPertanian", panen, "Isi dulu dong hasil panennya dalam kg.")) return;
+        const baris = [["Hasil panen", panen.toLocaleString("id-ID") + " kg"],
+                       ["Batas wajib zakat", nisab + " kg"],
+                       ["Kadar zakat", (persen * 100) + "%"]];
+        if (panen < nisab) {
+            tampil("hasilPertanian", false, "Belum wajib zakat", baris, "", "Hasil panennya belum nyampe batas wajib zakat.");
+        } else {
+            const kg = panen * persen;
+            let total = "<strong>" + kg.toLocaleString("id-ID") + " kg</strong>";
+            
+            // =====================================================
+            // PERBAIKAN TAMPILAN: Kata "atau" turun ke baris baru dan tengah
+            // =====================================================
+            if (harga > 0) total += "<span style='display:block; margin: 8px 0; font-size: 16px; font-weight: normal;'>atau</span><strong>" + formatRupiah(kg * harga) + "</strong>";
+            
+            tampil("hasilPertanian", true, "Kamu udah wajib zakat nih", baris, total, "Zakat pertanian dikeluarin pas panen, nggak perlu nunggu setahun.");
+        }
+    });
+
+    el("hitungDagang").addEventListener("click", function () {
+        const total = num("modalDagang") + num("untungDagang") + num("piutangDagang") - num("utangDagang");
+        if (!wajibIsiAngka("hasilDagang", total, "Isi dulu modal, untung, atau piutangnya. Total setelah dikurangi utang harus lebih dari nol ya.")) return;
+        const nisab = NISAB_EMAS * num("hargaEmas");
+        const baris = [["Harta dagang bersih", formatRupiah(total)],
+                       ["Batas wajib zakat", formatRupiah(nisab)]];
+        if (total < nisab) {
+            tampil("hasilDagang", false, "Belum wajib zakat", baris, "", "Harta dagangmu belum nyampe batas wajib zakat.");
+        } else if (el("haulDagang").value !== "ya") {
+            tampil("hasilDagang", false, "Belum wajib zakat", baris, "", "Hartanya udah cukup, tapi usahanya belum genap setahun.");
+        } else {
+            tampil("hasilDagang", true, "Kamu udah wajib zakat nih", baris,
+                "<strong>" + formatRupiah(total * 0.025) + "</strong>", "Besarnya 2,5% dari harta dagang setelah dikurangi utang.");
+        }
+    });
+
+    el("hitungTabungan")?.addEventListener("click", function () {
+        const saldo = num("saldoTabungan");
+        const bunga = num("bungaTabungan");
+        const haul = el("haulTabungan").value;
+        const hargaEmas = num("hargaEmas");
+        
+        if (!wajibIsiAngka("hasilTabungan", saldo, "Isi dulu saldo tabungan kamu.")) return;
+        if (hargaEmas === 0) return tampil("hasilTabungan", false, "Harga acuan kosong", [], "", "Tolong isi harga emas per gram di bagian atas halaman dulu.");
+
+        const nisabEmas = NISAB_EMAS * hargaEmas;
+        const hartaBersih = saldo - bunga;
+        
+        const baris = [["Saldo Bersih", formatRupiah(hartaBersih)],
+                       ["Batas wajib zakat (Nisab)", formatRupiah(nisabEmas)]];
+
+        if (haul === 'tidak') {
+            tampil("hasilTabungan", false, "Belum wajib zakat", baris, "", "Saldo kamu belum mengendap genap 1 tahun (haul).");
+        } else if (hartaBersih < nisabEmas) {
+            tampil("hasilTabungan", false, "Belum wajib zakat", baris, "", "Saldo bersihmu masih di bawah nisab.");
+        } else {
+            tampil("hasilTabungan", true, "Kamu udah wajib zakat nih", baris,
+                "<strong>" + formatRupiah(hartaBersih * 0.025) + "</strong>", "Besarnya 2,5% dari saldo bersih (tanpa bunga).");
+        }
+    });
+    
+    el("hitungSaham")?.addEventListener("click", function () {
+        const nilaiSaham = num("nilaiSaham");
+        const dividen = num("dividenSaham");
+        const haul = el("haulSaham").value;
+        const hargaEmas = num("hargaEmas");
+        
+        if (!wajibIsiAngka("hasilSaham", nilaiSaham + dividen, "Isi dulu nilai saham atau dividen kamu.")) return;
+        if (hargaEmas === 0) return tampil("hasilSaham", false, "Harga acuan kosong", [], "", "Tolong isi harga emas per gram di bagian atas halaman dulu.");
+
+        const nisabEmas = NISAB_EMAS * hargaEmas;
+        const totalAset = nilaiSaham + dividen;
+        
+        const baris = [["Total Saham & Dividen", formatRupiah(totalAset)],
+                       ["Batas wajib zakat (Nisab)", formatRupiah(nisabEmas)]];
+
+        if (haul === 'tidak') {
+            tampil("hasilSaham", false, "Belum wajib zakat", baris, "", "Saham kamu belum dimiliki genap 1 tahun (haul).");
+        } else if (totalAset < nisabEmas) {
+            tampil("hasilSaham", false, "Belum wajib zakat", baris, "", "Total aset sahammu masih di bawah nisab.");
+        } else {
+            tampil("hasilSaham", true, "Kamu udah wajib zakat nih", baris,
+                "<strong>" + formatRupiah(totalAset * 0.025) + "</strong>", "Zakatnya 2,5% dari total nilai aset dan dividen.");
+        }
+    });
+   
+    el("hitungRikaz")?.addEventListener("click", function () {
+        const nilaiRikaz = num("nilaiRikaz");
+        
+        if (!wajibIsiAngka("hasilRikaz", nilaiRikaz, "Isi dulu nilai barang temuannya.")) return;
+
+        const zakat = nilaiRikaz * 0.20;
+        const baris = [["Nilai Barang Temuan", formatRupiah(nilaiRikaz)]];
+        
+        tampil("hasilRikaz", true, "Wajib Zakat Rikaz (20%)", baris,
+            "<strong>" + formatRupiah(zakat) + "</strong>", "Harta temuan langsung dikeluarkan zakatnya 20% tanpa syarat haul atau nisab.");
+    });
+    
+    el("hitungPerusahaan")?.addEventListener("click", function () {
+        const asetLancar = num("asetLancar");
+        const utang = num("utangPerusahaan");
+        const haul = el("haulPerusahaan").value;
+        const hargaEmas = num("hargaEmas");
+        
+        if (!wajibIsiAngka("hasilPerusahaan", asetLancar, "Isi dulu total aset lancar perusahaannya.")) return;
+        if (hargaEmas === 0) return tampil("hasilPerusahaan", false, "Harga acuan kosong", [], "", "Tolong isi harga emas per gram di bagian atas halaman dulu.");
+
+        const nisabEmas = NISAB_EMAS * hargaEmas;
+        const kekayaanPerusahaan = asetLancar - utang;
+        
+        const baris = [["Harta Bersih Perusahaan", formatRupiah(kekayaanPerusahaan)],
+                       ["Batas wajib zakat (Nisab)", formatRupiah(nisabEmas)]];
+
+        if (haul === 'tidak') {
+            tampil("hasilPerusahaan", false, "Belum wajib zakat", baris, "", "Perusahaan belum berjalan genap 1 tahun (haul).");
+        } else if (kekayaanPerusahaan < nisabEmas) {
+            tampil("hasilPerusahaan", false, "Belum wajib zakat", baris, "", "Harta bersih perusahaan masih di bawah nisab.");
+        } else {
+            tampil("hasilPerusahaan", true, "Perusahaan wajib zakat", baris,
+                "<strong>" + formatRupiah(kekayaanPerusahaan * 0.025) + "</strong>", "Zakatnya 2,5% dari kekayaan bersih perusahaan.");
+        }
+    });
+
+    el("hitungPeternakan")?.addEventListener("click", function () {
+        const jenis = el("jenisTernak").value;
+        const jumlah = num("jumlahTernak");
+        const haul = el("haulTernak").value;
+        
+        if (!wajibIsiAngka("hasilPeternakan", jumlah, "Isi dulu dong jumlah ekor hewan ternaknya.")) return;
+
+        const baris = [["Jenis Hewan", jenis === 'kambing' ? 'Kambing / Domba' : 'Sapi / Kerbau'],
+                       ["Jumlah Ternak", jumlah + " ekor"]];
+
+        if (haul === 'tidak') {
+            return tampil("hasilPeternakan", false, "Belum wajib zakat", baris, "", "Ternak belum dimiliki selama 1 tahun (haul).");
         }
 
-        const wajib = haul && objekZakat >= nisabTahun && objekZakat > 0;
-        const zakat = wajib ? objekZakat * 0.025 : 0;
+        let hasilZakat = "";
+        let wajib = false;
 
-        tampilkanHasil("hasilPerusahaan", {
-            jenisZakat: "Zakat Perusahaan",
-            wajib,
-            barisDetail: [
-                ...detailKhusus,
-                ["Nisab (85 gr Emas)", formatRupiah(nisabTahun)],
-                ["Status Haul (1 Tahun)", haul ? "Terpenuhi" : "Belum Terpenuhi"]
-            ],
-            nilaiUtama: formatRupiah(zakat),
-            catatanTambahan: !haul
-                ? "Perusahaan belum mencapai haul 1 tahun."
-                : "Aset/laba kena zakat perusahaan belum mencapai nisab 85 gram emas."
-        });
-    });
-
-    // C. ZAKAT PERDAGANGAN
-    document.getElementById("hitungDagang").addEventListener("click", () => {
-        const modal = parseRupiah(document.getElementById("modalDagang").value);
-        const untung = parseRupiah(document.getElementById("untungDagang").value);
-        const piutang = parseRupiah(document.getElementById("piutangDagang").value);
-        const utang = parseRupiah(document.getElementById("utangDagang").value);
-        const rugi = parseRupiah(document.getElementById("rugiDagang").value);
-        const haul = document.getElementById("haulDagang").value === "ya";
-
-        const hartaBersih = Math.max(0, (modal + untung + piutang) - (utang + rugi));
-        const { nisabTahun } = getNisab();
-        const wajib = haul && hartaBersih >= nisabTahun && hartaBersih > 0;
-        const zakat = wajib ? hartaBersih * 0.025 : 0;
-
-        tampilkanHasil("hasilDagang", {
-            jenisZakat: "Zakat Perdagangan",
-            wajib,
-            barisDetail: [
-                ["Harta Perdagangan Bersih", formatRupiah(hartaBersih)],
-                ["Nisab (85 gr Emas)", formatRupiah(nisabTahun)],
-                ["Status Haul (1 Tahun)", haul ? "Terpenuhi" : "Belum Terpenuhi"]
-            ],
-            nilaiUtama: formatRupiah(zakat),
-            catatanTambahan: !haul
-                ? "Usaha perdagangan belum mencapai haul 1 tahun."
-                : "Harta perdagangan bersih belum mencapai nisab 85 gram emas."
-        });
-    });
-
-    // D. ZAKAT EMAS & PERAK
-    document.getElementById("hitungEmas").addEventListener("click", () => {
-        const jenis = document.getElementById("jenisLogam").value;
-        const totalGram = parseFloat(document.getElementById("gramLogam").value) || 0;
-        const dipakaiGram = parseFloat(document.getElementById("gramDipakai").value) || 0;
-        const haul = document.getElementById("haulLogam").value === "ya";
-
-        const gramBersih = Math.max(0, totalGram - dipakaiGram);
-        const nisabGram = jenis === "emas" ? 85 : 595;
-        const { hargaEmas, hargaPerak } = getNisab();
-        const hargaPerGram = jenis === "emas" ? hargaEmas : hargaPerak;
-
-        const wajib = haul && gramBersih >= nisabGram;
-        const zakatGram = wajib ? gramBersih * 0.025 : 0;
-        const zakatRupiah = zakatGram * hargaPerGram;
-
-        tampilkanHasil("hasilEmas", {
-            jenisZakat: `Zakat ${jenis === "emas" ? "Emas" : "Perak"}`,
-            wajib,
-            barisDetail: [
-                ["Berat Wajib Zakat (Total − Dipakai)", `${gramBersih.toLocaleString("id-ID")} gram`],
-                ["Batas Nisab", `${nisabGram} gram`],
-                ["Taksiran Nilai Rupiah", formatRupiah(gramBersih * hargaPerGram)],
-                ["Status Haul (1 Tahun)", haul ? "Terpenuhi" : "Belum Terpenuhi"]
-            ],
-            nilaiUtama: `${formatRupiah(zakatRupiah)} (${zakatGram.toFixed(2)} gr)`,
-            catatanTambahan: !haul
-                ? "Kepemilikan logam mulia belum mencapai haul 1 tahun."
-                : `Berat bersih belum mencapai nisab ${nisabGram} gram.`
-        });
-    });
-
-    // E. ZAKAT TABUNGAN
-    document.getElementById("hitungTabungan").addEventListener("click", () => {
-        const saldo = parseRupiah(document.getElementById("saldoTabungan").value);
-        const bunga = parseRupiah(document.getElementById("bungaTabungan").value);
-        const haul = document.getElementById("haulTabungan").value === "ya";
-
-        const saldoBersih = Math.max(0, saldo - bunga);
-        const { nisabTahun } = getNisab();
-        const wajib = haul && saldoBersih >= nisabTahun && saldoBersih > 0;
-        const zakat = wajib ? saldoBersih * 0.025 : 0;
-
-        tampilkanHasil("hasilTabungan", {
-            jenisZakat: "Zakat Tabungan",
-            wajib,
-            barisDetail: [
-                ["Saldo Tabungan Bersih", formatRupiah(saldoBersih)],
-                ["Nisab (85 gr Emas)", formatRupiah(nisabTahun)],
-                ["Status Haul (1 Tahun)", haul ? "Terpenuhi" : "Belum Terpenuhi"]
-            ],
-            nilaiUtama: formatRupiah(zakat),
-            catatanTambahan: !haul
-                ? "Saldo tabungan belum mengendap selama 1 tahun (haul)."
-                : "Saldo tabungan belum mencapai nisab 85 gram emas."
-        });
-    });
-
-    // F. ZAKAT SAHAM
-    document.getElementById("hitungSaham").addEventListener("click", () => {
-        const nilai = parseRupiah(document.getElementById("nilaiSaham").value);
-        const dividen = parseRupiah(document.getElementById("dividenSaham").value);
-        const haul = document.getElementById("haulSaham").value === "ya";
-
-        const totalAset = nilai + dividen;
-        const { nisabTahun } = getNisab();
-        const wajib = haul && totalAset >= nisabTahun && totalAset > 0;
-        const zakat = wajib ? totalAset * 0.025 : 0;
-
-        tampilkanHasil("hasilSaham", {
-            jenisZakat: "Zakat Saham",
-            wajib,
-            barisDetail: [
-                ["Total Nilai Saham + Dividen", formatRupiah(totalAset)],
-                ["Nisab (85 gr Emas)", formatRupiah(nisabTahun)],
-                ["Status Haul (1 Tahun)", haul ? "Terpenuhi" : "Belum Terpenuhi"]
-            ],
-            nilaiUtama: formatRupiah(zakat),
-            catatanTambahan: !haul
-                ? "Kepemilikan investasi belum mencapai haul 1 tahun."
-                : "Total nilai investasi belum mencapai nisab 85 gram emas."
-        });
-    });
-
-    // G. ZAKAT PERTANIAN
-    document.getElementById("hitungPertanian").addEventListener("click", () => {
-        const nisabKg = parseFloat(document.getElementById("jenisPanen").value);
-        const hasilKg = parseFloat(document.getElementById("hasilPanen").value) || 0;
-        const tarif = parseFloat(document.getElementById("pengairan").value);
-        const hargaKg = parseRupiah(document.getElementById("hargaPanen").value);
-
-        const wajib = hasilKg >= nisabKg && hasilKg > 0;
-        const zakatKg = wajib ? hasilKg * tarif : 0;
-        const zakatRp = zakatKg * hargaKg;
-
-        const teksZakat = hargaKg > 0
-            ? `${zakatKg.toLocaleString("id-ID")} kg (${formatRupiah(zakatRp)})`
-            : `${zakatKg.toLocaleString("id-ID")} kg`;
-
-        tampilkanHasil("hasilPertanian", {
-            jenisZakat: "Zakat Pertanian",
-            wajib,
-            barisDetail: [
-                ["Total Hasil Panen", `${hasilKg.toLocaleString("id-ID")} kg`],
-                ["Batas Nisab", `${nisabKg} kg`],
-                ["Kadar Zakat", `${tarif * 100}%`]
-            ],
-            nilaiUtama: teksZakat,
-            catatanTambahan: `Hasil panen belum mencapai batas nisab ${nisabKg} kg.`
-        });
-    });
-
-    // H. ZAKAT PETERNAKAN
-    document.getElementById("hitungPeternakan").addEventListener("click", () => {
-        const jenis = document.getElementById("jenisTernak").value;
-        const jumlah = parseInt(document.getElementById("jumlahTernak").value, 10) || 0;
-        const haul = document.getElementById("haulTernak").value === "ya";
-
-        const nisabEkor = jenis === "kambing" ? 40 : 30;
-        const wajib = haul && jumlah >= nisabEkor;
-        let kadarTeks = "0 ekor";
+        if (jenis === 'kambing') {
+            if (jumlah < 40) {
+                hasilZakat = "Belum wajib zakat (Nisab minimal 40 ekor).";
+            } else if (jumlah <= 120) {
+                hasilZakat = "1 ekor kambing/domba"; wajib = true;
+            } else if (jumlah <= 200) {
+                hasilZakat = "2 ekor kambing/domba"; wajib = true;
+            } else if (jumlah <= 399) {
+                hasilZakat = "3 ekor kambing/domba"; wajib = true;
+            } else {
+                const kelipatan = Math.floor(jumlah / 100);
+                hasilZakat = kelipatan + " ekor kambing/domba (1 ekor tiap kelipatan 100)"; 
+                wajib = true;
+            }
+        } else if (jenis === 'sapi') {
+            if (jumlah < 30) {
+                hasilZakat = "Belum wajib zakat (Nisab minimal 30 ekor).";
+            } else if (jumlah <= 39) {
+                hasilZakat = "1 ekor sapi umur 1 tahun (Tabi')"; wajib = true;
+            } else if (jumlah <= 59) {
+                hasilZakat = "1 ekor sapi umur 2 tahun (Musinnah)"; wajib = true;
+            } else if (jumlah <= 69) {
+                hasilZakat = "2 ekor sapi umur 1 tahun (Tabi')"; wajib = true;
+            } else if (jumlah <= 79) {
+                hasilZakat = "1 ekor sapi umur 1 thn & 1 ekor umur 2 thn"; wajib = true;
+            } else {
+                hasilZakat = "Konsultasikan dengan Amil Zakat untuk rumus kelipatannya."; wajib = true;
+            }
+        }
 
         if (wajib) {
-            if (jenis === "kambing") {
-                if (jumlah <= 120) kadarTeks = "1 ekor kambing/domba";
-                else if (jumlah <= 200) kadarTeks = "2 ekor kambing/domba";
-                else if (jumlah <= 399) kadarTeks = "3 ekor kambing/domba";
-                else kadarTeks = `${Math.floor(jumlah / 100)} ekor kambing/domba`;
-            } else {
-                if (jumlah <= 39) kadarTeks = "1 ekor sapi umur 1 tahun (tabi')";
-                else if (jumlah <= 59) kadarTeks = "1 ekor sapi umur 2 tahun (musinnah)";
-                else if (jumlah <= 69) kadarTeks = "2 ekor sapi umur 1 tahun";
-                else {
-                    // Kombinasi kelipatan 30 (tabi') dan 40 (musinnah)
-                    let sisa = jumlah;
-                    let musinnah = Math.floor(sisa / 40);
-                    let tabi = 0;
-                    while (musinnah >= 0) {
-                        const rem = jumlah - musinnah * 40;
-                        if (rem % 30 === 0) {
-                            tabi = rem / 30;
-                            break;
-                        }
-                        musinnah--;
-                    }
-                    if (musinnah < 0) {
-                        tabi = Math.floor(jumlah / 30);
-                        musinnah = 0;
-                    }
-                    const bagian = [];
-                    if (tabi > 0) bagian.push(`${tabi} ekor sapi umur 1 thn`);
-                    if (musinnah > 0) bagian.push(`${musinnah} ekor sapi umur 2 thn`);
-                    kadarTeks = bagian.join(" + ");
-                }
-            }
+            tampil("hasilPeternakan", true, "Wajib Zakat Peternakan", baris, "<strong>" + hasilZakat + "</strong>", "");
+        } else {
+            tampil("hasilPeternakan", false, "Belum wajib zakat", baris, "", hasilZakat);
         }
-
-        tampilkanHasil("hasilPeternakan", {
-            jenisZakat: "Zakat Peternakan",
-            wajib,
-            barisDetail: [
-                ["Jumlah Ternak", `${jumlah} ekor`],
-                ["Batas Nisab", `${nisabEkor} ekor`],
-                ["Status Haul (1 Tahun)", haul ? "Terpenuhi" : "Belum Terpenuhi"]
-            ],
-            nilaiUtama: kadarTeks,
-            catatanTambahan: !haul
-                ? "Hewan ternak belum dipelihara selama 1 tahun (haul)."
-                : `Jumlah ternak belum mencapai nisab ${nisabEkor} ekor.`
-        });
     });
 
-    // I. ZAKAT RIKAZ
-    document.getElementById("hitungRikaz").addEventListener("click", () => {
-        const nilai = parseRupiah(document.getElementById("nilaiRikaz").value);
-        const wajib = nilai > 0;
-        const zakat = nilai * 0.2;
-
-        tampilkanHasil("hasilRikaz", {
-            jenisZakat: "Zakat Rikaz",
-            wajib,
-            barisDetail: [
-                ["Nilai Barang Temuan", formatRupiah(nilai)],
-                ["Syarat Nisab & Haul", "Tidak ada (langsung ditunaikan)"],
-                ["Kadar Zakat", "20%"]
-            ],
-            nilaiUtama: formatRupiah(zakat),
-            catatanTambahan: "Masukkan nilai barang temuan untuk menghitung zakat rikaz."
-        });
-    });
-
-    // J. ZAKAT FITRAH
-    document.getElementById("hitungFitrah").addEventListener("click", () => {
-        const jiwa = Math.max(1, parseInt(document.getElementById("jumlahJiwa").value, 10) || 1);
-        const takaran = parseFloat(document.getElementById("takaranFitrah").value) || 2.5;
-        const hargaBeras = parseRupiah(document.getElementById("hargaBeras").value);
-
-        const totalBeras = jiwa * takaran;
-        const totalUang = totalBeras * hargaBeras;
-
-        tampilkanHasil("hasilFitrah", {
-            jenisZakat: "Zakat Fitrah",
-            wajib: true,
-            barisDetail: [
-                ["Jumlah Jiwa", `${jiwa} orang`],
-                ["Total Beras", `${totalBeras.toLocaleString("id-ID")} kg (${(jiwa * 3.5).toLocaleString("id-ID")} liter)`],
-                ["Harga Beras Acuan", `${formatRupiah(hargaBeras)} / kg`]
-            ],
-            nilaiUtama: hargaBeras > 0
-                ? `${formatRupiah(totalUang)} atau ${totalBeras.toLocaleString("id-ID")} kg beras`
-                : `${totalBeras.toLocaleString("id-ID")} kg beras`,
-            catatanTambahan: ""
-        });
-    });
-});
+}
